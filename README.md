@@ -56,14 +56,14 @@ Arhitecture
 >                                            |   Presentation     |
 >                                            +--------------------+
 >                                  Notify Interaction | | Retrieve Information
->                                            +--------------------+
->                                            |      Control       |
->                                            +--------------------+
->                                          Notify Tick | (To Both Music And Data Flow)
->                                            +--------------------+
->                                            |        Music       |
->                                            +--------------------+
->                                                      | Abstract And Encapsulate
+>      +-------------------------------------------------------------------------------------------------+
+>      |                                            Control                                              |
+>      +-------------------------------------------------------------------------------------------------+
+>           |                              Notify Tick | (To Both Music And Data Flow)            |
+>           |                                +--------------------+                               |
+>           | Recording Or Buffering         |        Music       |                Taping Control |
+>           |                                +--------------------+                               |
+>           |                                          | Abstract And Encapsulate                 |
 >      +------------+   Record The Sound     +--------------------+   Process The Sound    +-------------+
 >      |  Input     | ---------------------> |     Data Flow      | ---------------------> |  Output     |
 >      +------------+                        +--------------------+                        +-------------+
