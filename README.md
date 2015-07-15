@@ -1,6 +1,6 @@
 Resonance
 ===========
-  In order to begin with, you should thoroughly read this passage, so that you could understand what is going on in this project. You're free to fork and modify the forked repository, but you should send pull request to us if you want to contribute to the project, in order to prevent underlying defects going into the repository.
+  In order to begin with, you should thoroughly read this passage, so that you could understand what is going on in this project. You're free to fork and modify the forked repository, but you should send pull request to us if you want to contribute to the project.
 
 Introduction
 -----------
