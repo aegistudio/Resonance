@@ -14,6 +14,7 @@ public class Type<T>
 	public static final Type<Structure[]> STRUCTURE_ARRAY = new Type<Structure[]>(9, "Structure[]");
 	public static final Type<Class<?>> CLASS = new Type<Class<?>>(10, "Class");
 	public static final Type<Boolean> BOOLEAN = new Type<Boolean>(11, "boolean");
+	public static final Type<Byte> BYTE = new Type<Byte>(12, "byte");
 	
 	protected Type(int ordinal, String name){
 		this.ordinal = ordinal;

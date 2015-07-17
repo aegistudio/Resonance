@@ -1,9 +1,9 @@
 Resonance
-===========
+=========
   In order to begin with, you should thoroughly read this passage, so that you could understand what is going on in this project. You're free to fork and modify the forked repository, but you should send pull request to us if you want to contribute to the project.
 
 Introduction
------------
+------------
   This repository is intended to provide a cross platform music production environment for music producers, as well as a convenient application programming interface for plugin development. The project is writen in Java, but may be some native code intended for using VST architecture plugins.
 
   Music production consists of three phases: the pre-production phase, the production phase, and the post-production phase. In pre-production phase, producers compose music and rehearse band. In the production phase, producers record vocals and instrument performances into computer. In the post-production phase, producers arrange and mix music, master tape the album. Digital Audio Workstation (DAW) is intended for giving a hand to producers in music production.
@@ -16,7 +16,7 @@ Arhitecture
 -----------
   The software is divided into 7 main sub-layers. In order to comprehend them, you should read this part carefully.
 
-  A DAW can be viewed as a digital signal processor. The signal flows into the DAW, the DAW do some modulation, and then flows out of the DAW (to speakers). So there're should be three main modules to handle it: input, process, output.
+  A DAW can be viewed as a digital signal processor. The signal flows into the DAW, the DAW do some modification, and then flows out of the DAW (to speakers). So there're should be three main modules to handle it: input, process, output.
 
 >      +------------+   Record The Sound     +--------------------+   Process The Sound    +-------------+
 >      |  Input     | ---------------------> |     Process        | ---------------------> |  Output     |
@@ -74,11 +74,23 @@ Arhitecture
 
   Here we get 7 layers. There seem to be many layers, but the responsibility of each layer is actually simple:
 
->      Input: Record The Sound, Or Format The Audio File Into Which Is Compatible With The Sound System.
->      Process: Provides Application Programming Interface For Sound Processing, And Process Sound For The Upper Structures.
->      Data Flow: Determine How The Data Is Flown In The Software. Render The Sound For Output.
->      Output: Format The Sound Into The Format Which Is Compatible With Sound Interface Card Or Audio File.
->      Music: Abstract The Timing, The Pitch And The Loundness. Encapsulate Data Flow Units Into Channels, Tracks Mixers And So On. Send Events To Plugins.
->      Control: Coordinate The Work Of Lower Structure, Provide Services To Presentation.
->      Presentation: Receive User Interactions, Display Critical Software Information.
+>   - Input: Record The Sound, Or Format The Audio File Into Which Is Compatible With The Sound System.
+>   - Process: Provides Application Programming Interface For Sound Processing, And Process Sound For The Upper Structures.
+>   - Data Flow: Determine How The Data Is Flown In The Software. Render The Sound For Output.
+>   - Output: Format The Sound Into The Format Which Is Compatible With Sound Interface Card Or Audio File.
+>   - Music: Abstract The Timing, The Pitch And The Loundness. Encapsulate Data Flow Units Into Channels, Tracks Mixers And So On. Send Events To Plugins.
+>   - Control: Coordinate The Work Of Lower Structure, Provide Services To Presentation.
+>   - Presentation: Receive User Interactions, Display Critical Software Information.
+
+Acoustic Layers: Input, Process, Output
+---------------------------------------
+  The so called acoustic layer uses acoustic physics domain for describing sound. That is, the sound is described in sample points. The value of one sample point may be encoded in PCM (Pulse Code Modulation) voltage, or a-law and miu-law value if you want to use these algorithms. And the interval between sample point depends on sample rate. There may be multiple streams of samples flow out of the software if you use stereo or more channels.
+
+  It would be hard for developers to master these encodings, and the coupling between software and device will increase exponentially. So we use 'clamp double', or 64-bit real between -1.0 and 1.0, when the signal get processed. The signal will get formatted when it flows in or out 'process' layer. And the 'input' and 'output' will take the responsibility. Though they are also responsible for receiving and sending digital signals to converters.
+
+  But there are two factors that can not be shielded (for reducing complexity.), which are sample rate and channels. And when rendering, as we are working on discrete digital signal, we do need a sample rate to tell us how long does it takes to go from one sample to the next sample. We still need channels as we may work on either mono or stereo signal. These factors should keep coherence with output device, as we do need the efficiency for rendering. The recorded sound should be converted to match the output format.
+
+  So we use clamp double in process layer, as well as provided sample rate and channels. The sample rate and channel should keep coherence with the output layer, and the input layer should convert its recorded data into the output format. Now we know that the format should be a global variable for the three modules, and we shall call it the 'acoustic environment'. The acoustic environment is shared along acoustic layers and should not be changed in one taping transation.
+
+  However, the user is granted to change this configuration to match his installed sound interface card (SIC). So a interface configuration dialog should be provided by the present layer to change this configuration. When this config changes, the whole sound system should be resetted.
 

@@ -151,6 +151,20 @@ public class BinarySerializer implements BinaryParser<Structure>, Serializer
 				output.writeBoolean(type);
 			}
 		});
+		
+		parserMapper.put(BYTE, new BinaryParser<Byte>()
+		{
+
+			@Override
+			public Byte parse(DataInputStream input) throws Exception {
+				return input.readByte();
+			}
+
+			@Override
+			public void write(DataOutputStream output, Byte type) throws Exception {
+				output.writeByte(type);
+			}
+		});
 	}
 	
 	@Override

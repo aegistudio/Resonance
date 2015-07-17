@@ -1,5 +1,7 @@
 package net.aegistudio.resonance;
 
+import java.util.Arrays;
+
 public class Frame
 {
 	private final double[][] frameData;
@@ -30,12 +32,23 @@ public class Frame
 		return this.channels;
 	}
 	
+	public void zero()
+	{
+		for(int i = 0; i < this.channels; i ++)
+			Arrays.fill(this.frameData[i], 0);
+	}
+	
 	public Frame clone()
 	{
 		Frame returnValue = new Frame(this.channels, this.samplesPerFrame);
-		for(int i = 0; i < this.channels; i ++)
-			System.arraycopy(this.frameData[i], 0, returnValue.frameData[i], 0, this.samplesPerFrame);
+		returnValue.copy(this);
 		return returnValue;
+	}
+	
+	public void copy(Frame frame)
+	{
+		for(int i = 0; i < this.channels; i ++)
+			System.arraycopy(frame.frameData[i], 0, this.frameData[i], 0, this.samplesPerFrame);
 	}
 	
 	public void mix(Frame anotherFrame, double dry, double wet)
@@ -43,10 +56,9 @@ public class Frame
 		if(anotherFrame.samplesPerFrame != this.samplesPerFrame
 				|| anotherFrame.channels != this.channels)
 			throw new IllegalArgumentException("Can't blend two frames that are different in size.");
-		
 		for(int i = 0; i < this.channels; i ++)
 			for(int j = 0; j < this.samplesPerFrame; j ++) 
 				this.frameData[i][j] = dry * this.frameData[i][j]
 						+ wet * anotherFrame.frameData[i][j];
-	}
+	}	
 }

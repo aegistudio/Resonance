@@ -9,4 +9,8 @@ public interface DataflowFacade extends SerializedObject
 	public void render(Frame frame);
 	
 	public void reset(Environment environment);
+	
+	public DataflowNode getSuperSource();
+	
+	public DataflowNode getSuperDrain();
 }
