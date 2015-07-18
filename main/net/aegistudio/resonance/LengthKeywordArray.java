@@ -2,6 +2,7 @@ package net.aegistudio.resonance;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * A length object is denoted by [a, b]. <br>
@@ -20,17 +21,19 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 {
 	KeywordArray<Double, T> innerArray;
 	Collection<KeywordEntry<Double, T>> monitorSet;
+	Collection<KeywordEntry<Double, T>> removalSet;
 	
 	public LengthKeywordArray(KeywordArray<Double, T> innerArray)
 	{
 		this.innerArray = innerArray;
 		this.monitorSet = new HashSet<KeywordEntry<Double, T>>();
 		this.endContainer = new HashSet<KeywordEntry<Double, T>>();
+		this.removalSet = new HashSet<KeywordEntry<Double, T>>();
 	}
 	
 	Collection<KeywordEntry<Double, T>> beginContainer;
 	
-	public void betweenTrigger(double begin, double end)
+	public synchronized void betweenTrigger(double begin, double end)
 	{
 		this.beginContainer = innerArray.between(begin, end);
 	
@@ -42,8 +45,10 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 				
 		monitorSet.addAll(beginContainer);
 		
-		for(KeywordEntry<Double, T> entry : monitorSet)
+		Iterator<KeywordEntry<Double, T>> iterator = monitorSet.iterator();
+		while(iterator.hasNext())
 		{
+			KeywordEntry<Double, T> entry = iterator.next();
 			if(entry.getKeyword() + entry.getValue().getLength() < end 
 					|| entry.getKeyword() >= end)
 			{
@@ -51,38 +56,46 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 				monitorSet.remove(entry);
 			}
 		}
-				
+		
+		for(KeywordEntry<Double, T> entry : removalSet)
+			if(monitorSet.contains(entry))
+			{
+				monitorSet.remove(entry);
+				endContainer.add(entry);
+			}
+		removalSet.clear();
 	}
 	
 	Collection<KeywordEntry<Double, T>> endContainer;
 	
-	public Collection<KeywordEntry<Double, T>> begin()
+	public synchronized Collection<KeywordEntry<Double, T>> begin()
 	{
 		return this.beginContainer;
 	}
 	
-	public Collection<KeywordEntry<Double, T>> activated()
+	public synchronized Collection<KeywordEntry<Double, T>> activated()
 	{
 		return this.monitorSet;
 	}
 	
-	public Collection<KeywordEntry<Double, T>> end()
+	public synchronized Collection<KeywordEntry<Double, T>> end()
 	{
 		return this.endContainer;
 	}
 
 	@Override
-	public void add(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
+	public synchronized void add(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
 		innerArray.add(entry);
 	}
 
 	@Override
-	public void remove(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
+	public synchronized void remove(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
 		innerArray.remove(entry);
+		removalSet.add(entry);
 	}
 
 	@Override
-	public Collection<net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T>> between(Double lowerBound,
+	public synchronized Collection<net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T>> between(Double lowerBound,
 			Double upperBound) {
 		this.betweenTrigger(lowerBound, upperBound);
 		return this.begin();

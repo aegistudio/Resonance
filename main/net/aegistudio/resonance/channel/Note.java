@@ -1,10 +1,11 @@
 package net.aegistudio.resonance.channel;
 
+import net.aegistudio.resonance.LengthObject;
 import net.aegistudio.resonance.serial.SerializedObject;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
 
-public class Note implements SerializedObject
+public class Note implements SerializedObject, LengthObject
 {
 	public byte pitch;
 	public byte velocity;
@@ -29,5 +30,10 @@ public class Note implements SerializedObject
 		output.set("note", Type.BYTE, pitch);
 		output.set("velocity", Type.BYTE, (byte)127);
 		output.set("duration", Type.DOUBLE, 1.0);
+	}
+
+	@Override
+	public double getLength() {
+		return duration;
 	}
 }

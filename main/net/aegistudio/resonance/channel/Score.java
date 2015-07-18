@@ -2,12 +2,11 @@ package net.aegistudio.resonance.channel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import net.aegistudio.resonance.KeywordArray;
 import net.aegistudio.resonance.KeywordArray.DefaultKeywordEntry;
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
+import net.aegistudio.resonance.LengthKeywordArray;
 import net.aegistudio.resonance.serial.SerializedObject;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
@@ -38,27 +37,9 @@ public class Score implements SerializedObject
 		this.notes.remove(new DefaultKeywordEntry<Double, Note>(offset, note));
 	}
 	
-	public void getBeginNotes(double begin, double end, Collection<KeywordEntry<Double, Note>> buffer)
+	public LengthKeywordArray<Note> getLengthMonitor()
 	{
-		buffer.addAll(this.notes.between(begin, end));
-	}
-	
-	public Collection<KeywordEntry<Double, Note>> getEndNotes(double begin, double end, 
-			Collection<KeywordEntry<Double, Note>> beginNotes)
-	{
-		Collection<KeywordEntry<Double, Note>> endNotes = new HashSet<KeywordEntry<Double, Note>>();
-		Iterator<KeywordEntry<Double, Note>> iterator = beginNotes.iterator();
-		while(iterator.hasNext())
-		{
-			KeywordEntry<Double, Note> entry = iterator.next();
-			if(end > entry.getKeyword() + entry.getValue().duration || begin < entry.getKeyword())
-			{
-				endNotes.add(new DefaultKeywordEntry<Double, Note>(entry.getKeyword() + entry.getValue().duration,
-						entry.getValue()));
-				beginNotes.remove(entry);
-			}
-		}
-		return endNotes;
+		return new LengthKeywordArray<Note>(notes);
 	}
 	
 	@Override

@@ -1,16 +1,11 @@
 package net.aegistudio.resonance.channel;
 
+import net.aegistudio.resonance.LengthObject;
 import net.aegistudio.resonance.plugin.Event;
 import net.aegistudio.resonance.serial.SerializedObject;
 
-public interface Clip extends SerializedObject
-{
-	/**
-	 * Returns the clip length.
-	 * @return clip length in beats.
-	 */
-	public double getClipLength();
-	
+public interface Clip extends SerializedObject, LengthObject
+{	
 	/**
 	 * Returns the events between ticks in beats.
 	 * @param begin the begin tick.

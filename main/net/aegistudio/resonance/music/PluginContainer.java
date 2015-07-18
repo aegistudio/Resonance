@@ -10,8 +10,8 @@ public class PluginContainer<T extends DataflowNode> implements SerializedObject
 {	
 	/** The generator Node for this channel **/
 	protected final T pluginNode;
-	private Plugin plugin;
-	private Structure parameters = new Structure();
+	protected Plugin plugin;
+	protected Structure parameters = new Structure();
 
 	public PluginContainer(T pluginNode){
 		this.pluginNode = pluginNode;
