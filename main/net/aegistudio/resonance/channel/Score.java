@@ -38,9 +38,9 @@ public class Score implements SerializedObject
 		this.notes.remove(new DefaultKeywordEntry<Double, Note>(offset, note));
 	}
 	
-	public Collection<KeywordEntry<Double, Note>> getBeginNotes(double begin, double end)
+	public void getBeginNotes(double begin, double end, Collection<KeywordEntry<Double, Note>> buffer)
 	{
-		return this.notes.between(begin, end);
+		buffer.addAll(this.notes.between(begin, end));
 	}
 	
 	public Collection<KeywordEntry<Double, Note>> getEndNotes(double begin, double end, 
@@ -75,7 +75,9 @@ public class Score implements SerializedObject
 	@Override
 	public void save(Structure output) {
 		ArrayList<Structure> noteList = new ArrayList<Structure>();
-		for(KeywordEntry<Double, Note> entry : notes.all())
+		Collection<KeywordEntry<Double, Note>> allNotes = notes.all();
+		
+		for(KeywordEntry<Double, Note> entry : allNotes)
 		{
 			Structure note = new Structure();
 			note.set("offset", Type.DOUBLE, entry.getKeyword());

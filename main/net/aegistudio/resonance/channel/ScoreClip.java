@@ -68,8 +68,7 @@ public class ScoreClip implements Clip
 		{
 			double factor = samplesPerFrame / (end - begin);
 			ArrayList<Event> eventReturnValue = new ArrayList<Event>();
-			Collection<KeywordEntry<Double, Note>> beginNotes = this.theScore.getBeginNotes(begin, end);
-			this.beginNotes.addAll(beginNotes);
+			this.theScore.getBeginNotes(begin, end, beginNotes);
 			for(KeywordEntry<Double, Note> beginNote : beginNotes)
 				eventReturnValue.add(new NoteOnEvent(beginNote.getValue().pitch, beginNote.getValue().velocity,
 						(int)((beginNote.getKeyword() - begin) * factor)));
