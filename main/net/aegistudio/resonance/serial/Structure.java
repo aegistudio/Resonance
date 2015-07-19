@@ -1,6 +1,7 @@
 package net.aegistudio.resonance.serial;
 
 import java.lang.reflect.Array;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -28,6 +29,11 @@ public class Structure
 				valueMap.remove(key);
 			typeMap.put(key, type);
 		}
+	}
+	
+	public Set<String> keySet()
+	{
+		return this.typeMap.keySet();
 	}
 	
 	@SuppressWarnings("unchecked")

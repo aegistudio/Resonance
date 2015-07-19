@@ -7,6 +7,7 @@ import net.aegistudio.resonance.KeywordArray;
 import net.aegistudio.resonance.KeywordArray.DefaultKeywordEntry;
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.LengthKeywordArray;
+import net.aegistudio.resonance.RoundedKeywordArray;
 import net.aegistudio.resonance.serial.SerializedObject;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
@@ -18,7 +19,8 @@ public class Score implements SerializedObject
 	
 	public Score()
 	{
-		// Initialzing The Keyword Array Notes.
+		//XXX The instancializing method should be changed. 
+		this.notes = new RoundedKeywordArray<Note>();
 	}
 	
 	public double getScoreLength()
@@ -35,6 +37,11 @@ public class Score implements SerializedObject
 	public void removeNote(double offset, Note note)
 	{
 		this.notes.remove(new DefaultKeywordEntry<Double, Note>(offset, note));
+	}
+	
+	public KeywordArray<Double, Note> getAllNotes()
+	{
+		return this.notes;
 	}
 	
 	public LengthKeywordArray<Note> getLengthMonitor()

@@ -10,12 +10,8 @@ public interface MusicFacade extends SerializedObject
 	public void tick();
 	
 	public void setBeatsPerMinute(float bpm);
-	
-	public void setBeatsPerMeasure(int beats);
-	
+		
 	public float getBeatsPerMinute();
-	
-	public int getBeatsPerMeasure();
 	
 	public void setBeatPosition(double position);
 	

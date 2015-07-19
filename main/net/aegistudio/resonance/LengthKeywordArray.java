@@ -42,7 +42,7 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 		for(KeywordEntry<Double, T> entry : beginContainer)
 			if(monitorSet.contains(entry))
 				endContainer.add(entry);
-				
+		
 		monitorSet.addAll(beginContainer);
 		
 		Iterator<KeywordEntry<Double, T>> iterator = monitorSet.iterator();
@@ -53,7 +53,7 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 					|| entry.getKeyword() >= end)
 			{
 				endContainer.add(entry);
-				monitorSet.remove(entry);
+				iterator.remove();
 			}
 		}
 		

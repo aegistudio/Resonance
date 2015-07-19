@@ -25,13 +25,7 @@ public class MusicDecoy implements MusicFacade
 	public void setBeatsPerMinute(float bpm) {			}
 
 	@Override
-	public void setBeatsPerMeasure(int beats) {			}
-
-	@Override
 	public float getBeatsPerMinute() {		return 0;	}
-
-	@Override
-	public int getBeatsPerMeasure() {	return 0;			}
 
 	@Override
 	public void reset(Environment environment) {			}

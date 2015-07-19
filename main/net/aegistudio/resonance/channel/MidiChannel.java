@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.aegistudio.resonance.KeywordArray;
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.LengthKeywordArray;
+import net.aegistudio.resonance.NamedHolder;
 import net.aegistudio.resonance.RoundedKeywordArray;
 import net.aegistudio.resonance.dataflow.RouterDrainNode;
 import net.aegistudio.resonance.dataflow.RouterSourceNode;
@@ -17,13 +18,13 @@ import net.aegistudio.resonance.serial.Type;
 public class MidiChannel extends PluginContainer<StripNode> implements Channel
 {
 	/** This Two Nodes Are Useful When The Channel Was Muted. **/
-	private final RouterSourceNode sourceNode;
-	private final RouterDrainNode drainNode;
+	public final RouterSourceNode sourceNode;
+	public final RouterDrainNode drainNode;
 	
 	private final LengthKeywordArray<ScoreClip> scoreClips;
-	private final ScoreHolder scoreHolder;
+	private final NamedHolder<Score> scoreHolder;
 	
-	public MidiChannel(ScoreHolder scoreHolder){
+	public MidiChannel(NamedHolder<Score> scoreHolder){
 		super(new StripNode());
 		
 		KeywordArray<Double, ScoreClip> innerArray = new RoundedKeywordArray<ScoreClip>();
@@ -86,9 +87,19 @@ public class MidiChannel extends PluginContainer<StripNode> implements Channel
 	 */
 	public void doTick(double begin, double end, int samplesPerFrame)
 	{
+		if(this.plugin == null) return;
 		this.scoreClips.betweenTrigger(begin, end);
 		for(KeywordEntry<Double, ScoreClip> clip : this.scoreClips.activated())
 			for(Event event : clip.getValue().getEvents(begin - clip.getKeyword(), end - clip.getKeyword(), samplesPerFrame))
 				super.plugin.trigger(event);
+		for(KeywordEntry<Double, ScoreClip> clip : this.scoreClips.end())
+			for(Event event : clip.getValue().offload(samplesPerFrame))
+				super.plugin.trigger(event);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Clip> KeywordArray<Double, T> getClips(Class<T> clazz) {
+		return (KeywordArray<Double, T>) this.scoreClips;
 	}
 }

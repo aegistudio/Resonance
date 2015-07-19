@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.LengthKeywordArray;
+import net.aegistudio.resonance.NamedHolder;
 import net.aegistudio.resonance.music.NoteOffEvent;
 import net.aegistudio.resonance.music.NoteOnEvent;
 import net.aegistudio.resonance.plugin.Event;
@@ -12,12 +13,12 @@ import net.aegistudio.resonance.serial.Type;
 
 public class ScoreClip implements Clip
 {
-	protected final ScoreHolder scoreHolder;
+	protected final NamedHolder<Score> scoreHolder;
 	protected String scoreName;
 	protected double clipLength = -1;
 	protected double innerOffset = 0.0;
 	
-	public ScoreClip(ScoreHolder scoreHolder)
+	public ScoreClip(NamedHolder<Score> scoreHolder)
 	{
 		this.scoreHolder = scoreHolder;
 	}
@@ -56,7 +57,7 @@ public class ScoreClip implements Clip
 	{
 		if(this.scoreHolder.hasUpdated(this))
 		{
-			this.theScore = this.scoreHolder.getScore(scoreName);
+			this.theScore = this.scoreHolder.get(scoreName);
 			if(this.theScore != null)
 				this.scoreMonitor = this.theScore.getLengthMonitor();
 		}
@@ -93,10 +94,19 @@ public class ScoreClip implements Clip
 	public double getLength() {
 		this.checkUpdated();
 		if(clipLength <= 0)		//Non Positive Means 'Length Depends On Score'
-			if(this.scoreHolder.getScore(scoreName) != null)
+			if(this.scoreHolder.get(scoreName) != null)
 				return this.theScore.getScoreLength();
 			else return 0.0;
 		else return this.clipLength;
+	}
+
+	@Override
+	public Event[] offload(int samplesPerFrame) {
+		ArrayList<Event> eventReturnValue = new ArrayList<Event>();
+		for(KeywordEntry<Double, Note> endNote : this.scoreMonitor.activated())
+			eventReturnValue.add(new NoteOffEvent(endNote.getValue().pitch, samplesPerFrame - 1));
+
+		return eventReturnValue.toArray(new Event[0]);
 	}
 
 }
