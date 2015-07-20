@@ -16,7 +16,6 @@ public class Track implements SerializedObject
 		this.trackDrainNode = trackSourceNode;
 	}
 	
-	
 	@Override
 	public void load(Structure input) {
 		// TODO Auto-generated method stub

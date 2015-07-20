@@ -2,6 +2,7 @@ package net.aegistudio.resonance.music;
 
 import net.aegistudio.resonance.Environment;
 import net.aegistudio.resonance.NamedHolder;
+import net.aegistudio.resonance.OrderedNamedHolder;
 import net.aegistudio.resonance.channel.Channel;
 import net.aegistudio.resonance.channel.ChannelHolder;
 import net.aegistudio.resonance.channel.Score;
@@ -28,7 +29,7 @@ public class MusicController implements MusicFacade
 	public MusicController()
 	{
 
-		this.scoreHolder = new NamedHolder<Score>("score", false)
+		this.scoreHolder = new OrderedNamedHolder<Score>("score", false)
 		{
 			@Override
 			protected Score newObject(Class<?> clazz) {
@@ -63,7 +64,7 @@ public class MusicController implements MusicFacade
 	@Override
 	public void tick() {
 		double newBeatPosition = this.beatPosition + increment;
-		for(Channel channel : this.channelHolder.all())
+		for(Channel channel : this.channelHolder.allValues())
 			channel.doTick(beatPosition, newBeatPosition, samplesPerFrame);
 		this.beatPosition = newBeatPosition;
 	}

@@ -1,9 +1,12 @@
 package net.aegistudio.resonance;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import net.aegistudio.resonance.KeywordArray.DefaultKeywordEntry;
+import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.serial.SerializedObject;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
@@ -23,17 +26,18 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		this.notExists = "The " + className + " doesn't exists.";
 		this.shouldStoreClass = shouldStoreClass;
 	}
+	
 	@Override
 	public void load(Structure input) {
 		for(String name : input.keySet())
 		{
 			Structure subStructure = input.get(name, Type.STRUCTURE, new Structure());
-			Class<?> clazz = subStructure.get("class", Type.CLASS, null);
+			Class<?> clazz = null;
+			if(this.shouldStoreClass) clazz = subStructure.get("class", Type.CLASS, null);
 			T t = this.newObject(clazz);
 			t.load(subStructure);
 			entries.put(name, t);
 		}
-
 	}
 	
 	protected abstract T newObject(Class<?> clazz);
@@ -46,11 +50,11 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 			T t = entries.get(name);
 			Structure obj = new Structure();
 			t.save(obj);
-			obj.set("class", Type.CLASS, t.getClass());
+			if(this.shouldStoreClass)
+				obj.set("class", Type.CLASS, t.getClass());
 			output.set(name, Type.STRUCTURE, obj);
 		}
 	}
-	
 	
 	public synchronized boolean doesExists(String name)
 	{
@@ -115,8 +119,16 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		}
 	}
 	
-	public Collection<T> all()
+	public Collection<T> allValues()
 	{
 		return this.entries.values();
+	}
+	
+	public Collection<KeywordEntry<String, T>> allEntries()
+	{
+		ArrayList<KeywordEntry<String, T>> entries = new ArrayList<KeywordEntry<String, T>>();
+		for(String key : this.entries.keySet())
+			entries.add(new DefaultKeywordEntry<String, T>(key, this.entries.get(key)));
+		return entries;
 	}
 }
