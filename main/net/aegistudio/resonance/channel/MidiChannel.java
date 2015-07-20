@@ -41,6 +41,10 @@ public class MidiChannel extends PluginContainer<StripNode> implements Channel
 		/** Connect Drain Node With The Channel Node **/
 		this.drainNode.addInputNode(pluginNode);
 		this.pluginNode.addOutputNode(drainNode);
+		
+		/** Connect Router Nodes Together **/
+		this.sourceNode.addOutputNode(drainNode);
+		this.drainNode.addInputNode(sourceNode);
 	}
 	
 	public void setMuted(boolean muted){

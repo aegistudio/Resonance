@@ -60,6 +60,7 @@ public class Resonance
 				{
 					Frame frame = idleQueue.next();
 					musicFacade.tick();
+					frame.zero();
 					dataflowFacade.render(frame);
 					outputQueue.push(frame);
 				}
@@ -78,7 +79,6 @@ public class Resonance
 				{
 					Frame frame = outputQueue.next();
 					outputFacade.output(frame);
-					frame.zero();
 					idleQueue.push(frame);
 				}
 				if(!isPaused)

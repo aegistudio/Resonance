@@ -12,9 +12,9 @@ public abstract class NoteEvent implements Event{
 		this.frameOffset = frameOffset;
 	}
 	
-	public Note getScaleNote()
+	public ScaleNote getScaleNote()
 	{
-		return Note.scaleNotes[this.note % 12];
+		return ScaleNote.scaleNotes[this.note % 12];
 	}
 	
 	public int getScale()

@@ -33,6 +33,7 @@ public class ScoreLogic
 		
 		ScoreClip theClip = new ScoreClip(scoreHolder); 
 		theClip.setScore("score1");
+		theClip.trim(4, 0.5);
 		
 		Channel theChannel = new MidiChannel(scoreHolder);
 		KeywordEntry<Double, ScoreClip> theClipEntry
@@ -59,7 +60,7 @@ public class ScoreLogic
 		});
 		
 		float currentPosition = 0.0f;
-		while(currentPosition < 4.0f)
+		while(currentPosition < 5.0f)
 		{
 			System.out.printf("%.1f\n", currentPosition);
 			float newPosition = currentPosition + 0.1f;

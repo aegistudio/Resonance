@@ -64,7 +64,7 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		else return this.create(name, null);
 	}
 	
-	public synchronized T create(String name, Class<?> clazz)
+	public synchronized T create(String name, Class<? extends T> clazz)
 	{
 		if(this.doesExists(name))
 			throw new IllegalArgumentException(String.format(alreadyExists, name));

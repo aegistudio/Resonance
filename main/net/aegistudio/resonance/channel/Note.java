@@ -11,6 +11,13 @@ public class Note implements SerializedObject, LengthObject
 	public byte velocity;
 	public double duration;
 	
+	public Note(net.aegistudio.resonance.music.ScaleNote note, int scale, byte velocity, double duration)
+	{
+		this.pitch = (byte) (12 * scale + note.scaleOffset);
+		this.velocity = velocity;
+		this.duration = duration;
+	}
+	
 	public Note(byte pitch, byte velocity, double duration)
 	{
 		this.pitch = pitch;

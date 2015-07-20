@@ -27,8 +27,10 @@ public class DrainNode extends StripNode
 		this.factor = (this.factor + 1) % inputNodes.size();
 		if(this.factor == 0)
 		{
-			this.containedPlugin.process(input, writeFrame);
+			if(this.containedPlugin != null)
+				this.containedPlugin.process(input, writeFrame);
 			if(this.outputNode != null) this.outputNode.pass(writeFrame);
+			writeFrame.zero();
 		}
 	}
 	
@@ -36,5 +38,6 @@ public class DrainNode extends StripNode
 	public void reset(ResetEvent event) {
 		super.reset(event);
 		this.factor = 0;
+		writeFrame.zero();
 	}
 }

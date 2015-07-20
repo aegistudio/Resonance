@@ -70,8 +70,8 @@ public class ScoreClip implements Clip
 			return new Event[0];
 		else
 		{
-			begin = begin + innerOffset;
-			end = end + innerOffset;
+			begin = begin - innerOffset;
+			end = end - innerOffset;
 			
 			double factor = samplesPerFrame / (end - begin);
 			ArrayList<Event> eventReturnValue = new ArrayList<Event>();

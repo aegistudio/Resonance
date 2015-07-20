@@ -13,10 +13,10 @@ import net.aegistudio.resonance.serial.Type;
 
 public class MusicController implements MusicFacade
 {
-	protected float beatPerMinutes = 120.0f;
+	protected float beatsPerMinute = 120.0f;
 	protected float sampleRate = 0;
 	protected int samplesPerFrame = 0;
-	protected float beatsPerFrame = 0;
+	protected float increment = 0;
 	
 	protected double beatPosition = 0;
 	
@@ -25,7 +25,7 @@ public class MusicController implements MusicFacade
 	public final NamedHolder<Track> mixer;
 	public final DataflowController dataflowController;
 	
-	public MusicController(DataflowController dataflowController)
+	public MusicController()
 	{
 
 		this.scoreHolder = new NamedHolder<Score>("score", false)
@@ -45,24 +45,24 @@ public class MusicController implements MusicFacade
 
 	@Override
 	public void load(Structure input) {
-		this.beatPerMinutes = input.get("bpm", Type.FLOAT, 120.0f);
+		this.beatsPerMinute = input.get("bpm", Type.FLOAT, 120.0f);
 	}
 
 	@Override
 	public void save(Structure output) {
-		output.set("bpm", Type.FLOAT, this.beatPerMinutes);
+		output.set("bpm", Type.FLOAT, this.beatsPerMinute);
 	}
 
 	@Override
 	public void reset(Environment environment) {
 		this.sampleRate = environment.sampleRate;
 		this.samplesPerFrame = environment.samplesPerFrame;
-		this.beatsPerFrame = samplesPerFrame / sampleRate;
+		this.increment = samplesPerFrame / sampleRate * (beatsPerMinute / 60);
 	}
 
 	@Override
 	public void tick() {
-		double newBeatPosition = this.beatPosition + beatsPerFrame;
+		double newBeatPosition = this.beatPosition + increment;
 		for(Channel channel : this.channelHolder.all())
 			channel.doTick(beatPosition, newBeatPosition, samplesPerFrame);
 		this.beatPosition = newBeatPosition;
@@ -70,12 +70,13 @@ public class MusicController implements MusicFacade
 
 	@Override
 	public void setBeatsPerMinute(float bpm) {
-		this.beatPerMinutes = bpm;
+		this.beatsPerMinute = bpm;
+		this.increment = samplesPerFrame / sampleRate * (beatsPerMinute / 60);
 	}
 
 	@Override
 	public float getBeatsPerMinute() {
-		return this.beatPerMinutes;
+		return this.beatsPerMinute;
 	}
 
 	@Override
