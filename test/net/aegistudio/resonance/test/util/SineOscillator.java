@@ -21,6 +21,8 @@ public class SineOscillator implements Plugin
 	public final HashMap<Integer, ArrayList<PartialOscillator>> oscillators
 		= new HashMap<Integer, ArrayList<PartialOscillator>>();
 	
+	public final HashMap<Integer, Integer> toRemove	= new HashMap<Integer, Integer>();
+	
 	@Override
 	public void create(Structure parameter) {
 		
@@ -47,16 +49,29 @@ public class SineOscillator implements Plugin
 		}
 		else if(event instanceof NoteOffEvent)
 		{
-			ArrayList<PartialOscillator> oscillatorList = 
-					oscillators.get(((NoteOffEvent) event).getNote());
-			if(oscillatorList != null && !oscillatorList.isEmpty())
-				oscillatorList.remove(0);
-			polytones --;
+			int note = ((NoteOffEvent) event).getNote();
+			Integer value = toRemove.get(note);
+			if(value == null) value = 0;
+			toRemove.put(note, value + 1);
 		}
 	}
 
 	@Override
-	public void process(Frame input, Frame output) {		
+	public void process(Frame input, Frame output) {
+		for(Integer key : toRemove.keySet())
+		{
+			Integer count = toRemove.get(key);
+			ArrayList<PartialOscillator> list = oscillators.get(key);
+			if(list == null) continue;
+			for(int i = 0; i < count; i ++)
+				if(!list.isEmpty())
+				{
+					list.remove(0);
+					polytones --;
+				}
+		}
+		toRemove.clear();
+		
 		output.zero(); process.zero();
 		for(ArrayList<PartialOscillator> oscillatorList : oscillators.values())
 			for(PartialOscillator oscillator : oscillatorList)
