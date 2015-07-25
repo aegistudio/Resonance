@@ -2,6 +2,7 @@ package net.aegistudio.resonance;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.serial.SerializedObject;
@@ -10,7 +11,7 @@ import net.aegistudio.resonance.serial.Type;
 
 public abstract class OrderedNamedHolder<T extends SerializedObject> extends NamedHolder<T>
 {
-	public ArrayList<String> orderList;
+	public List<String> orderList;
 	public OrderedNamedHolder(String className, boolean shouldStoreClass) {
 		super(className, shouldStoreClass);
 		orderList = new ArrayList<String>();
@@ -74,5 +75,29 @@ public abstract class OrderedNamedHolder<T extends SerializedObject> extends Nam
 			entries.put(name, t);
 			orderList.add(name);
 		}
+	}
+	
+	public void swap(String left, String right)
+	{
+		if(left.equals(right)) return;
+		int leftIndex = orderList.indexOf(left);
+		int rightIndex = orderList.indexOf(right);
+		if(leftIndex == -1 || rightIndex == -1)
+			return;
+		
+		orderList.set(rightIndex, left);
+		orderList.set(leftIndex, right);
+	}
+	
+	public void insert(String left, String right)
+	{
+		if(left.equals(right)) return;
+		int leftIndex = orderList.indexOf(left);
+		int rightIndex = orderList.indexOf(right);
+		if(leftIndex == -1 || rightIndex == -1)
+			return;
+		
+		orderList.remove(leftIndex);
+		orderList.add(orderList.indexOf(right), left);
 	}
 }

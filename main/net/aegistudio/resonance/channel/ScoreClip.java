@@ -30,6 +30,11 @@ public class ScoreClip implements Clip
 		this.innerOffset = 0.0;
 	}
 	
+	public String getScore()
+	{
+		return this.scoreName;
+	}
+	
 	public void trim(double clipLength, double innerOffset)
 	{
 		this.clipLength = clipLength;
@@ -100,6 +105,11 @@ public class ScoreClip implements Clip
 		else return this.clipLength;
 	}
 
+	public double getOffset()
+	{
+		return this.innerOffset;
+	}
+	
 	@Override
 	public Event[] offload(int samplesPerFrame) {
 		ArrayList<Event> eventReturnValue = new ArrayList<Event>();

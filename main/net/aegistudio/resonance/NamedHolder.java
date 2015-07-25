@@ -92,8 +92,8 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		if((old = entries.get(name)) == null)
 			throw new IllegalArgumentException(String.format(notExists, name));
 		
-		if(this.doesExists(name))
-			throw new IllegalArgumentException(String.format(alreadyExists, name));	
+		if(this.doesExists(newName))
+			throw new IllegalArgumentException(String.format(alreadyExists, newName));	
 
 		entries.remove(name);
 		entries.put(newName, old);

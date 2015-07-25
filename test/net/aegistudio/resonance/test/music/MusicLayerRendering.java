@@ -70,7 +70,7 @@ public class MusicLayerRendering {
 		
 		theScore.addNote(9.0, new Note(ScaleNote.B, 0, (byte)127, 1.0));
 		theScore.addNote(9.0, new Note(ScaleNote.D, 1, (byte)127, 1.0));
-		theScore.addNote(9.0, new Note(ScaleNote.G, 1, (byte)127, 1.0));
+		theScore.addNote(9.0, new Note(ScaleNote.F, 1, (byte)127, 1.0));
 		
 		theScore.addNote(11.0, new Note(ScaleNote.C, 3, (byte)127, 2.0));
 		theScore.addNote(11.0, new Note(ScaleNote.C, 2, (byte)127, 2.0));

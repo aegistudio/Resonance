@@ -40,8 +40,9 @@ public class MusicController implements MusicFacade
 		this.mixer = new Mixer();
 		this.channelHolder = new ChannelHolder(mixer, scoreHolder);
 		this.dataflowController = new DataflowController(((ChannelHolder)this.channelHolder).superSource);
-		((Mixer)this.mixer).master.trackSourceNode.addOutputNode(this.dataflowController.getSuperDrain());
-		this.dataflowController.getSuperDrain().addInputNode(((Mixer)this.mixer).master.trackSourceNode);
+		
+		((Mixer)this.mixer).master.trackDrainNode.addOutputNode(this.dataflowController.getSuperDrain());
+		this.dataflowController.getSuperDrain().addInputNode(((Mixer)this.mixer).master.trackDrainNode);
 	}
 
 	@Override

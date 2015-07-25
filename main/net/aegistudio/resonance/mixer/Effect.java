@@ -11,8 +11,8 @@ public class Effect extends PluginContainer<BlendStripNode>{
 	
 	/** This Two Nodes Are Useful When The Effect Was Muted. **/
 	// If A Effect Were Passed, The Stream Flow Into Will Flow Out As Usual.
-	private final RouterSourceNode sourceNode;
-	private final RouterDrainNode drainNode;
+	final RouterSourceNode sourceNode;
+	final RouterDrainNode drainNode;
 	
 	public Effect(){
 		super(new BlendStripNode());
@@ -41,8 +41,7 @@ public class Effect extends PluginContainer<BlendStripNode>{
 		super.pluginNode.setRatio(1 - value, value);
 	}
 	
-	public void load(Structure input)
-	{
+	public void load(Structure input){
 		super.load(input);
 		this.dryWetRatio = input.get("dryWetRatio", Type.DOUBLE, 0.0);
 		this.setMuted(input.get("mute", Type.BOOLEAN, true));

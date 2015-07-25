@@ -14,6 +14,11 @@ public interface Clip extends SerializedObject, LengthObject
 	public double getLength();
 	
 	/**
+	 * Returns the inner offset of the clip in beats/
+	 */
+	public double getOffset();
+	
+	/**
 	 * Returns the events between ticks in beats.
 	 * @param begin the begin tick.
 	 * @param ends the end tick.
