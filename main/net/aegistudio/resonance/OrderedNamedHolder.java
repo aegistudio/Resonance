@@ -37,11 +37,11 @@ public abstract class OrderedNamedHolder<T extends SerializedObject> extends Nam
 		orderList.set(index, newName);
 	}
 	
-	public Collection<KeywordEntry<String, T>> allEntries()
+	public Collection<? extends KeywordEntry<String, T>> allEntries()
 	{
 		ArrayList<KeywordEntry<String, T>> ordered = new ArrayList<KeywordEntry<String, T>>(orderList.size());
 		for(String entry : orderList)
-			ordered.add(new KeywordArray.DefaultKeywordEntry<String, T>(entry, super.entries.get(entry)));
+			ordered.add(super.entries.get(entry));
 		return ordered;
 	}
 	
@@ -52,7 +52,7 @@ public abstract class OrderedNamedHolder<T extends SerializedObject> extends Nam
 		for(int i = 0; i < orderList.size(); i ++)
 		{
 			String name = orderList.get(i);
-			T t = entries.get(name);
+			T t = entries.get(name).value;
 			Structure obj = new Structure();
 			t.save(obj);
 			obj.set("name", Type.STRING, name);
@@ -72,7 +72,7 @@ public abstract class OrderedNamedHolder<T extends SerializedObject> extends Nam
 			T t = this.newObject(clazz);
 			t.load(subStructure);
 			String name = subStructure.get("name", Type.STRING, null);
-			entries.put(name, t);
+			entries.put(name, new NamedEntry<T>(name, t));
 			orderList.add(name);
 		}
 	}

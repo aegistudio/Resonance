@@ -1,11 +1,9 @@
 package net.aegistudio.resonance;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import net.aegistudio.resonance.KeywordArray.DefaultKeywordEntry;
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.serial.SerializedObject;
 import net.aegistudio.resonance.serial.Structure;
@@ -17,7 +15,7 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 {
 	protected final String alreadyExists;
 	protected final String notExists;
-	protected final TreeMap<String, T> entries = new TreeMap<String, T>();
+	protected final TreeMap<String, NamedEntry<T>> entries = new TreeMap<String, NamedEntry<T>>();
 	protected final boolean shouldStoreClass;
 	
 	public NamedHolder(String className, boolean shouldStoreClass)
@@ -36,7 +34,8 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 			if(this.shouldStoreClass) clazz = subStructure.get("class", Type.CLASS, null);
 			T t = this.newObject(clazz);
 			t.load(subStructure);
-			entries.put(name, t);
+			NamedEntry<T> entry = new NamedEntry<T>(name, t);
+			entries.put(name, entry);
 		}
 	}
 	
@@ -47,7 +46,7 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 	{
 		for(String name : entries.keySet())
 		{
-			T t = entries.get(name);
+			T t = entries.get(name).getValue();
 			Structure obj = new Structure();
 			t.save(obj);
 			if(this.shouldStoreClass)
@@ -73,7 +72,7 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		if(this.doesExists(name))
 			throw new IllegalArgumentException(String.format(alreadyExists, name));
 		T returnValue = this.newObject(clazz);
-		entries.put(name, returnValue);
+		entries.put(name, new NamedEntry<T>(name, returnValue));
 		updated.clear();
 		return returnValue;
 	}
@@ -82,13 +81,14 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 	{
 		if(!this.doesExists(name))
 			throw new IllegalArgumentException(String.format(notExists, name));
+		entries.get(name).name = null;
 		entries.remove(name);
 		updated.clear();
 	}
 	
 	public synchronized void rename(String name, String newName)
 	{
-		T old;
+		NamedEntry<T> old;
 		if((old = entries.get(name)) == null)
 			throw new IllegalArgumentException(String.format(notExists, name));
 		
@@ -97,13 +97,16 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 
 		entries.remove(name);
 		entries.put(newName, old);
+		old.name = newName;
 		updated.clear();
 	}
 	
 	public synchronized T get(String name)
 	{
 		if(name == null) return null;
-		return entries.get(name);
+		NamedEntry<T> entry = entries.get(name);
+		if(entry == null) return null;
+		else return entry.value;
 	}
 	
 	HashSet<Object> updated = new HashSet<Object>();
@@ -119,16 +122,44 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 		}
 	}
 	
-	public Collection<T> allValues()
+	public Collection<? extends KeywordEntry<String, T>> allValues()
 	{
 		return this.entries.values();
 	}
 	
-	public Collection<KeywordEntry<String, T>> allEntries()
+	public Collection<? extends KeywordEntry<String, T>> allEntries()
 	{
-		ArrayList<KeywordEntry<String, T>> entries = new ArrayList<KeywordEntry<String, T>>();
-		for(String key : this.entries.keySet())
-			entries.add(new DefaultKeywordEntry<String, T>(key, this.entries.get(key)));
-		return entries;
+		return this.entries.values();
+	}
+	
+	/**
+	 * This class is intended to keep value identified when its
+	 * keyword changes.
+	 * 
+	 * @author aegistudio
+	 * @param <T>
+	 */
+	@SuppressWarnings("hiding")
+	public class NamedEntry<T> implements KeywordEntry<String, T>
+	{
+		protected String name;
+		protected T value;
+		
+		public NamedEntry(String key, T value)
+		{
+			this.name = key;
+			this.value = value;
+		}
+		
+		@Override
+		public String getKeyword() {
+			return name;
+		}
+
+		@Override
+		public T getValue() {
+			return value;
+		}
+		
 	}
 }
