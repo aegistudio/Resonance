@@ -9,7 +9,6 @@ import net.aegistudio.resonance.channel.ChannelHolder;
 import net.aegistudio.resonance.channel.Score;
 import net.aegistudio.resonance.dataflow.DataflowController;
 import net.aegistudio.resonance.mixer.Mixer;
-import net.aegistudio.resonance.mixer.Track;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
 
@@ -23,8 +22,8 @@ public class MusicController implements MusicFacade
 	protected double beatPosition = 0;
 	
 	public final NamedHolder<Score> scoreHolder;
-	public final NamedHolder<Channel> channelHolder;
-	public final NamedHolder<Track> mixer;
+	public final ChannelHolder channelHolder;
+	public final Mixer mixer;
 	public final DataflowController dataflowController;
 	
 	public MusicController()
@@ -91,6 +90,21 @@ public class MusicController implements MusicFacade
 	@Override
 	public double getBeatPosition() {
 		return this.beatPosition;
+	}
+
+	@Override
+	public NamedHolder<Score> getScoreHolder() {
+		return scoreHolder;
+	}
+
+	@Override
+	public ChannelHolder getChannelHolder() {
+		return channelHolder;
+	}
+
+	@Override
+	public Mixer getMixer() {
+		return mixer;
 	}
 
 }
