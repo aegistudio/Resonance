@@ -4,7 +4,7 @@ import net.aegistudio.resonance.LengthObject;
 import net.aegistudio.resonance.plugin.Event;
 import net.aegistudio.resonance.serial.SerializedObject;
 
-public interface Clip extends SerializedObject, LengthObject
+public interface Clip extends SerializedObject, LengthObject, Cloneable
 {
 	/**
 	 * Returns the length of the clip in beats.

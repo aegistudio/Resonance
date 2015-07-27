@@ -24,7 +24,13 @@ public class PluginContainer<T extends DataflowNode> implements SerializedObject
 		this.parameters = new Structure();
 		this.pluginNode.setPlugin(plugin);
 		this.plugin = plugin;
-		this.plugin.create(parameters);
+		if(this.plugin != null)
+			this.plugin.create(parameters);
+	}
+	
+	public Plugin getPlugin()
+	{
+		return this.plugin;
 	}
 	
 	public Structure getParameters()

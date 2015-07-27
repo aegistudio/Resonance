@@ -10,11 +10,19 @@ public class Mixer extends OrderedNamedHolder<Track>{
 	public final Track master;
 	public final NamedEntry<Track> masterEntry;
 	
+	public String masterName;
+	
 	public Mixer()
 	{
 		super("track", false);
 		this.master = new Track();
-		this.masterEntry = new NamedEntry<Track>((String)null, master);
+		this.masterEntry = new NamedEntry<Track>(null, master)
+		{
+			public String getKeyword()
+			{
+				return masterName;
+			}
+		};
 	}
 
 	@Override
@@ -22,9 +30,14 @@ public class Mixer extends OrderedNamedHolder<Track>{
 		return new Track();
 	}
 	
+	public void renameMaster(String masterName)
+	{
+		this.masterName = masterName;
+	}
+	
 	public Track get(String name)
 	{
-		if(name == null) return this.master;
+		if(name == null || name.equals(masterName)) return this.master;
 		else
 		{
 			Track target = super.get(name);
@@ -34,19 +47,25 @@ public class Mixer extends OrderedNamedHolder<Track>{
 		}
 	}
 	
+	public NamedEntry<Track> getEntry(String name)
+	{
+		if(name == null || name.equals(masterName)) return this.masterEntry;
+		else return super.getEntry(name);
+	}
+	
 	public Collection<? extends KeywordEntry<String, Track>> allEntries()
 	{
-		ArrayList<NamedEntry<Track>> entries = new ArrayList<NamedEntry<Track>>();
+		Collection<KeywordEntry<String, Track>> entries = new ArrayList<KeywordEntry<String, Track>>();
 		entries.add(masterEntry);
-		entries.addAll(entries);
+		entries.addAll(super.allEntries());
 		return entries;
 	}
 
 	public Collection<? extends KeywordEntry<String, Track>> allValues()
 	{
-		ArrayList<NamedEntry<Track>> entries = new ArrayList<NamedEntry<Track>>();
+		Collection<KeywordEntry<String, Track>> entries = new ArrayList<KeywordEntry<String, Track>>();
 		entries.add(masterEntry);
-		entries.addAll(entries);
+		entries.addAll(super.allValues());
 		return entries;
 	}
 }

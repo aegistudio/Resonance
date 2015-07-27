@@ -103,10 +103,15 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 	
 	public synchronized T get(String name)
 	{
-		if(name == null) return null;
-		NamedEntry<T> entry = entries.get(name);
+		NamedEntry<T> entry = this.getEntry(name);
 		if(entry == null) return null;
 		else return entry.value;
+	}
+	
+	public synchronized NamedEntry<T> getEntry(String name)
+	{
+		if(name == null) return null;
+		else return entries.get(name);
 	}
 	
 	HashSet<Object> updated = new HashSet<Object>();
@@ -139,8 +144,7 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 	 * @author aegistudio
 	 * @param <T>
 	 */
-	@SuppressWarnings("hiding")
-	public class NamedEntry<T> implements KeywordEntry<String, T>
+	public static class NamedEntry<T> implements KeywordEntry<String, T>
 	{
 		protected String name;
 		protected T value;
@@ -161,5 +165,10 @@ public abstract class NamedHolder<T extends SerializedObject> implements Seriali
 			return value;
 		}
 		
+		@Override
+		public String toString()
+		{
+			return getKeyword();
+		}
 	}
 }

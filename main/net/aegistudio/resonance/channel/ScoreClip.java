@@ -35,6 +35,14 @@ public class ScoreClip implements Clip
 		return this.scoreName;
 	}
 	
+	public ScoreClip clone()
+	{
+		ScoreClip scoreClip = new ScoreClip(this.scoreHolder);
+		scoreClip.setScore(scoreName);
+		scoreClip.trim(clipLength, innerOffset);
+		return scoreClip;
+	}
+	
 	public void trim(double clipLength, double innerOffset)
 	{
 		this.clipLength = clipLength;

@@ -15,14 +15,14 @@ public class ChannelHolder extends NamedHolder<Channel>
 	protected final NamedHolder<Score> scoreHolder;
 	public final DataflowNode superSource;
 	
-	public final TreeMap<String, String> channelToTrackMap;
+	public final TreeMap<String, NamedEntry<Track>> channelToTrackMap;
 	
 	public ChannelHolder(NamedHolder<Track> mixer, NamedHolder<Score> scoreHolder) {
 		super("channel", true);
 		this.scoreHolder = scoreHolder;
 		this.mixer = mixer;
 		this.superSource = new SourceNode();
-		this.channelToTrackMap = new TreeMap<String, String>();
+		this.channelToTrackMap = new TreeMap<String, NamedEntry<Track>>();
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class ChannelHolder extends NamedHolder<Channel>
 	}
 	
 	/** if targetTrack == null, then target at master **/
-	public void setTargetTrack(String channelName, String targetTrack)
+	public synchronized void setTargetTrack(String channelName, String targetTrack)
 	{
 		Channel channel = this.get(channelName);
 		if(channel == null) throw new IllegalArgumentException(String.format(super.notExists, channelName));
@@ -50,32 +50,40 @@ public class ChannelHolder extends NamedHolder<Channel>
 		if(channel instanceof MidiChannel) channelOutputNode = ((MidiChannel) channel).drainNode;
 		else return;
 		
-		DataflowNode trackSource = mixer.get(channelToTrackMap.get(channelName)).trackSourceNode;
+		DataflowNode trackSource = channelToTrackMap.get(channelName)
+				.getValue().trackSourceNode;
 		trackSource.removeInputNode(channelOutputNode);
 		channelOutputNode.removeOutputNode(trackSource);
 		channelToTrackMap.remove(channelName);
 		
-		Track target = mixer.get(targetTrack);
-		channelOutputNode.addOutputNode(target.trackSourceNode);
-		target.trackSourceNode.addInputNode(channelOutputNode);
+		NamedEntry<Track> target = mixer.getEntry(targetTrack);
+		channelOutputNode.addOutputNode(target.getValue().trackSourceNode);
+		target.getValue().trackSourceNode.addInputNode(channelOutputNode);
 		if(targetTrack != null)
-			channelToTrackMap.put(channelName, targetTrack);
+			channelToTrackMap.put(channelName, target);
 	}
 	
-	public void save(Structure output)
+	public synchronized void save(Structure output)
 	{
 		super.save(output);
 		Structure channelMap = new Structure();
 		output.set("channelmap", Type.STRUCTURE, channelMap);
 		for(String key : channelToTrackMap.keySet())
-			channelMap.set(key, Type.STRING, channelToTrackMap.get(key));
+			channelMap.set(key, Type.STRING, channelToTrackMap.get(key).getKeyword());
 	}
 	
-	public void load(Structure input)
+	public synchronized void load(Structure input)
 	{
 		super.load(input);
 		Structure channelMap = input.get("channelmap", Type.STRUCTURE, new Structure());
 		for(String key : channelMap.keySet())
-			this.channelToTrackMap.put(key, channelMap.get(key, Type.STRING, null));
+			this.channelToTrackMap.put(key, mixer.getEntry(channelMap.get(key, Type.STRING, null)));
+	}
+	
+	public NamedEntry<Track> getTargetTrack(String name)
+	{
+		NamedEntry<Track> entry = this.channelToTrackMap.get(name);
+		if(entry == null) return this.mixer.getEntry(null);
+		else return entry;
 	}
 }
