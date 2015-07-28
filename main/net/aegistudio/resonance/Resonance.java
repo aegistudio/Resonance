@@ -12,9 +12,9 @@ import net.aegistudio.resonance.output.OutputFacade;
 
 public class Resonance
 {
-	private final OutputFacade outputFacade;
-	private final DataflowFacade dataflowFacade;
-	private final MusicFacade musicFacade;
+	public final OutputFacade outputFacade;
+	public final DataflowFacade dataflowFacade;
+	public final MusicFacade musicFacade;
 	
 	private Environment environment;
 	private boolean hasEnvironmentChanged = true;
@@ -106,10 +106,5 @@ public class Resonance
 		this.environment = environment;
 		this.outputDevice = device;
 		this.hasEnvironmentChanged = true;
-	}
-	
-	public static void main(String[] arguments) throws Exception
-	{
-	
 	}
 }

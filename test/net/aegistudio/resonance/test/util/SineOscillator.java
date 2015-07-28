@@ -53,7 +53,7 @@ public class SineOscillator implements Plugin
 			Integer value = toRemove.get(note);
 			if(value == null) value = 0;
 			toRemove.put(note, value + 1);
-		}
+		}	
 	}
 
 	@Override
