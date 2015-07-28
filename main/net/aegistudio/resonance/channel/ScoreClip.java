@@ -14,7 +14,9 @@ import net.aegistudio.resonance.serial.Type;
 public class ScoreClip implements Clip
 {
 	protected final NamedHolder<Score> scoreHolder;
-	protected String scoreName;
+	
+	protected KeywordEntry<String, Score> scoreEntry;
+	
 	protected double clipLength = -1;
 	protected double innerOffset = 0.0;
 	
@@ -25,20 +27,29 @@ public class ScoreClip implements Clip
 	
 	public void setScore(String scoreName)
 	{
-		this.scoreName = scoreName;
-		this.clipLength = -1;
-		this.innerOffset = 0.0;
+		if(scoreName == null) return;
+		KeywordEntry<String, Score> entry = scoreHolder.getEntry(scoreName);
+		if(entry != scoreEntry)
+		{
+			scoreEntry = entry;
+			if(scoreEntry != null)
+			{
+				this.clipLength = -1;
+				this.innerOffset = 0.0;
+				scoreMonitor = scoreEntry.getValue().getLengthMonitor();
+			}
+		}
 	}
 	
-	public String getScore()
+	public KeywordEntry<String, Score> getScore()
 	{
-		return this.scoreName;
+		return this.scoreEntry;
 	}
 	
 	public ScoreClip clone()
 	{
 		ScoreClip scoreClip = new ScoreClip(this.scoreHolder);
-		scoreClip.setScore(scoreName);
+		scoreClip.setScore(scoreEntry.getKeyword());
 		scoreClip.trim(clipLength, innerOffset);
 		return scoreClip;
 	}
@@ -51,36 +62,27 @@ public class ScoreClip implements Clip
 	
 	@Override
 	public void load(Structure input) {
-		scoreName = input.get("score", Type.STRING, null);
+		setScore(input.get("score", Type.STRING, null));
 		clipLength = input.get("clip", Type.DOUBLE, -1.0);
 		innerOffset = input.get("offset", Type.DOUBLE, 0.0);
 	}
 
 	@Override
 	public void save(Structure output) {
-		output.set("score", Type.STRING, scoreName);
+		output.set("score", Type.STRING, scoreEntry.getKeyword());
 		output.set("clip", Type.DOUBLE, clipLength);	
 		output.set("offset", Type.DOUBLE, innerOffset);
 	}
 
-	Score theScore;
 	LengthKeywordArray<Note> scoreMonitor;
-	
-	protected void checkUpdated()
-	{
-		if(this.scoreHolder.hasUpdated(this))
-		{
-			this.theScore = this.scoreHolder.get(scoreName);
-			if(this.theScore != null)
-				this.scoreMonitor = this.theScore.getLengthMonitor();
-		}
-	}
 	
 	@Override
 	public Event[] getEvents(double begin, double end, int samplesPerFrame) {
-		this.checkUpdated();
-		if(this.theScore == null)
+		if(scoreEntry == null || scoreEntry.getKeyword() == null)
+		{
+			scoreEntry = null;
 			return new Event[0];
+		}
 		else
 		{
 			begin = begin - innerOffset;
@@ -105,11 +107,14 @@ public class ScoreClip implements Clip
 
 	@Override
 	public double getLength() {
-		this.checkUpdated();
-		if(clipLength <= 0)		//Non Positive Means 'Length Depends On Score'
-			if(this.scoreHolder.get(scoreName) != null)
-				return this.theScore.getScoreLength();
-			else return 0.0;
+		if(clipLength <= 0)
+		{
+			//Non Positive Means 'Length Depends On Score'
+			double length = 0.0;
+			if(this.scoreEntry != null)
+				length = this.scoreEntry.getValue().getScoreLength();
+			return Math.max(length, 1.0);
+		}
 		else return this.clipLength;
 	}
 

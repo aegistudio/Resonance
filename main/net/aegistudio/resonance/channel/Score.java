@@ -28,15 +28,17 @@ public class Score implements SerializedObject
 		return this.scoreLength;
 	}
 	
-	public void addNote(double offset, Note note)
+	public KeywordEntry<Double, Note> addNote(double offset, Note note)
 	{
-		this.notes.add(new DefaultKeywordEntry<Double, Note>(offset, note));
-		if(offset + note.duration > scoreLength) scoreLength = offset + note.duration; 
+		KeywordEntry<Double, Note> returnValue;
+		this.notes.add(returnValue = new DefaultKeywordEntry<Double, Note>(offset, note));
+		if(offset + note.duration > scoreLength) scoreLength = offset + note.duration;
+		return returnValue;
 	}
 	
-	public void removeNote(double offset, Note note)
+	public void removeNote(KeywordEntry<Double, Note> entry)
 	{
-		this.notes.remove(new DefaultKeywordEntry<Double, Note>(offset, note));
+		this.notes.remove(entry);
 	}
 	
 	public KeywordArray<Double, Note> getAllNotes()
