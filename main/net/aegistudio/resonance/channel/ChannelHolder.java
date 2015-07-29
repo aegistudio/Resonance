@@ -89,13 +89,11 @@ public class ChannelHolder extends NamedHolder<Channel> implements LengthObject
 		else return entry;
 	}
 	
-	double length = 0.0;
 	public double getLength()
 	{
-		if(super.hasUpdated(super.hasUpdated(this))){
-			for(KeywordEntry<String, Channel> channelEntry : super.allEntries())
-				length = Math.max(length, channelEntry.getValue().getLength());
-		}
+		double length = 0.0;
+		for(KeywordEntry<String, Channel> channelEntry : super.allEntries())
+			length = Math.max(length, channelEntry.getValue().getLength());
 		return length;
 	}
 }

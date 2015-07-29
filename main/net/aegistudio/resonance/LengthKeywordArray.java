@@ -87,16 +87,21 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 	@Override
 	public synchronized void add(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
 		innerArray.add(entry);
-		maximum = Math.max(maximum, entry.getKeyword() + entry.getValue().getLength());
+		recalculateMaximum();
+	}
+	
+	protected void recalculateMaximum()
+	{
+		maximum = 0;
+		for(KeywordEntry<Double, T> calc : all())
+			maximum = Math.max(calc.getKeyword() + calc.getValue().getLength(), maximum);
 	}
 
 	@Override
 	public synchronized void remove(net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T> entry) {
 		innerArray.remove(entry);
 		removalSet.add(entry);
-		if(entry.getKeyword() + entry.getValue().getLength() >= maximum)
-			for(KeywordEntry<Double, T> calc : all())
-				maximum = Math.max(calc.getValue().getLength() + calc.getValue().getLength(), maximum);
+		recalculateMaximum();
 	}
 
 	@Override
