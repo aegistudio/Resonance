@@ -2,6 +2,8 @@ package net.aegistudio.resonance.channel;
 
 import java.util.TreeMap;
 
+import net.aegistudio.resonance.KeywordArray.KeywordEntry;
+import net.aegistudio.resonance.LengthObject;
 import net.aegistudio.resonance.NamedHolder;
 import net.aegistudio.resonance.dataflow.DataflowNode;
 import net.aegistudio.resonance.dataflow.SourceNode;
@@ -9,7 +11,7 @@ import net.aegistudio.resonance.mixer.Track;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
 
-public class ChannelHolder extends NamedHolder<Channel>
+public class ChannelHolder extends NamedHolder<Channel> implements LengthObject
 {
 	protected final NamedHolder<Track> mixer;
 	protected final NamedHolder<Score> scoreHolder;
@@ -85,5 +87,15 @@ public class ChannelHolder extends NamedHolder<Channel>
 		NamedEntry<Track> entry = this.channelToTrackMap.get(name);
 		if(entry == null) return this.mixer.getEntry(null);
 		else return entry;
+	}
+	
+	double length = 0.0;
+	public double getLength()
+	{
+		if(super.hasUpdated(super.hasUpdated(this))){
+			for(KeywordEntry<String, Channel> channelEntry : super.allEntries())
+				length = Math.max(length, channelEntry.getValue().getLength());
+		}
+		return length;
 	}
 }

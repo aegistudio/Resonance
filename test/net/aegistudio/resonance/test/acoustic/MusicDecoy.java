@@ -48,4 +48,7 @@ public class MusicDecoy implements MusicFacade
 
 	@Override
 	public Mixer getMixer() {		return null;	}
+
+	@Override
+	public double getLength() {		return 0;		}
 }

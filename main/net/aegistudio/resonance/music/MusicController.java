@@ -107,4 +107,9 @@ public class MusicController implements MusicFacade
 		return mixer;
 	}
 
+	@Override
+	public double getLength() {
+		return channelHolder.getLength();
+	}
+
 }

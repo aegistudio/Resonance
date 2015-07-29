@@ -97,7 +97,7 @@ public class MusicLayerRendering {
 		
 		((MidiChannel)theChannel).setPlugin(plugin);
 		//((MidiChannel)theChannel).setMuted(true);
-		
+	
 		OutputFacade outputFacade = new OutputController();
 	
 		Resonance res = new Resonance(outputFacade, musicLayer.dataflowController, musicLayer);

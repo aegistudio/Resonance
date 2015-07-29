@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.aegistudio.resonance.KeywordArray;
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.LengthKeywordArray;
+import net.aegistudio.resonance.LengthObject;
 import net.aegistudio.resonance.NamedHolder;
 import net.aegistudio.resonance.RoundedKeywordArray;
 import net.aegistudio.resonance.dataflow.RouterDrainNode;
@@ -15,7 +16,7 @@ import net.aegistudio.resonance.plugin.Event;
 import net.aegistudio.resonance.serial.Structure;
 import net.aegistudio.resonance.serial.Type;
 
-public class MidiChannel extends PluginContainer<StripNode> implements Channel
+public class MidiChannel extends PluginContainer<StripNode> implements Channel, LengthObject
 {
 	/** This Two Nodes Are Useful When The Channel Was Muted. **/
 	public final RouterSourceNode sourceNode;
@@ -92,7 +93,7 @@ public class MidiChannel extends PluginContainer<StripNode> implements Channel
 	public void doTick(double begin, double end, int samplesPerFrame)
 	{
 		if(this.plugin == null) return;
-		this.scoreClips.betweenTrigger(begin, end);
+		this.scoreClips.betweenTrigger(begin, end);	
 		for(KeywordEntry<Double, ScoreClip> clip : this.scoreClips.activated())
 			for(Event event : clip.getValue().getEvents(begin - clip.getKeyword(), end - clip.getKeyword(), samplesPerFrame))
 				super.plugin.trigger(event);
@@ -105,5 +106,9 @@ public class MidiChannel extends PluginContainer<StripNode> implements Channel
 	@Override
 	public <T extends Clip> KeywordArray<Double, T> getClips(Class<T> clazz) {
 		return (KeywordArray<Double, T>) this.scoreClips;
+	}
+	
+	public double getLength(){
+		return scoreClips.getMaximun();
 	}
 }
