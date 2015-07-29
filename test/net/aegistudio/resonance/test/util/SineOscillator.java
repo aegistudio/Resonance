@@ -46,7 +46,7 @@ public class SineOscillator implements Plugin
 		else if(event instanceof NoteOnEvent)
 		{
 			int note = ((NoteOnEvent) event).getNote();
-			float phaseIncrement = (float) (2.0f * Math.PI * (1 << (note / pitches.length)) * 386.0f / sampleRate * pitches[note % pitches.length]);
+			float phaseIncrement = (float) (2.0f * Math.PI * (1 << (note / pitches.length)) * (386.0f / 4) / sampleRate * pitches[note % pitches.length]);
 			new PartialOscillator(this, note, phaseIncrement);
 			polytones ++;
 		}

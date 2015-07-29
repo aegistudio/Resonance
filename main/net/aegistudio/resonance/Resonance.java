@@ -94,6 +94,7 @@ public class Resonance
 	
 	public synchronized void stop()
 	{
+		if(isPaused) musicFacade.setBeatPosition(0);
 		isPlaying = false;
 		isPaused = false;
 	}
