@@ -111,6 +111,11 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 		return this.begin();
 	}
 
+	public void reset(){
+		this.monitorSet.clear();
+		this.endContainer.clear();
+	}
+	
 	@Override
 	public Collection<net.aegistudio.resonance.KeywordArray.KeywordEntry<Double, T>> all() {
 		return this.innerArray.all();

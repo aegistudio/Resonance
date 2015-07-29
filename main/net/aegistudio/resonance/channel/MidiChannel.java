@@ -111,4 +111,11 @@ public class MidiChannel extends PluginContainer<StripNode> implements Channel, 
 	public double getLength(){
 		return scoreClips.getMaximun();
 	}
+
+	@Override
+	public void reset() {
+		for(KeywordEntry<Double, ScoreClip> entry : this.scoreClips.all())
+			entry.getValue().reset();
+		this.scoreClips.reset();
+	}
 }

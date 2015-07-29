@@ -33,4 +33,9 @@ public interface Clip extends SerializedObject, LengthObject, Cloneable
 	 * @return the events happened between beats.
 	 */
 	public Event[] offload(int samplesPerFrame);
+	
+	/**
+	 * Call when the music layer reset itself.
+	 */
+	public void reset();
 }

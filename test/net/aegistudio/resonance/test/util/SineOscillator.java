@@ -39,6 +39,9 @@ public class SineOscillator implements Plugin
 		{
 			this.sampleRate = ((ResetEvent) event).environment.sampleRate;
 			this.process = new Frame(((ResetEvent) event).environment.channels, ((ResetEvent) event).environment.samplesPerFrame);
+			oscillators.clear();
+			toRemove.clear();
+			polytones = 0;
 		}
 		else if(event instanceof NoteOnEvent)
 		{

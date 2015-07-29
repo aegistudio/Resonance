@@ -82,7 +82,10 @@ public class Resonance
 					idleQueue.push(frame);
 				}
 				if(!isPaused)
+				{
 					outputFacade.stop();
+					musicFacade.setBeatPosition(0);
+				}
 			}
 		};
 		threadTaping.setPriority(Thread.MAX_PRIORITY);

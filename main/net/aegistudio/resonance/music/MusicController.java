@@ -60,6 +60,7 @@ public class MusicController implements MusicFacade
 		this.sampleRate = environment.sampleRate;
 		this.samplesPerFrame = environment.samplesPerFrame;
 		this.increment = samplesPerFrame / sampleRate * (beatsPerMinute / 60);
+		this.channelHolder.reset();
 	}
 
 	@Override

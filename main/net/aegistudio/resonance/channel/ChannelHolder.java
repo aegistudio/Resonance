@@ -96,4 +96,10 @@ public class ChannelHolder extends NamedHolder<Channel> implements LengthObject
 			length = Math.max(length, channelEntry.getValue().getLength());
 		return length;
 	}
+	
+	public void reset()
+	{
+		for(KeywordEntry<String, Channel> channelEntry : super.allEntries())
+			channelEntry.getValue().reset();
+	}
 }

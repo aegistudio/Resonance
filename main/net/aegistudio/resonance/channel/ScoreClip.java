@@ -38,6 +38,7 @@ public class ScoreClip implements Clip
 				this.innerOffset = 0.0;
 				scoreMonitor = scoreEntry.getValue().getLengthMonitor();
 			}
+			else scoreMonitor = null;
 		}
 	}
 	
@@ -130,6 +131,12 @@ public class ScoreClip implements Clip
 			eventReturnValue.add(new NoteOffEvent(endNote.getValue().pitch, samplesPerFrame - 1));
 
 		return eventReturnValue.toArray(new Event[0]);
+	}
+
+	@Override
+	public void reset() {
+		if(this.scoreMonitor != null)
+			this.scoreMonitor.reset();
 	}
 
 }
