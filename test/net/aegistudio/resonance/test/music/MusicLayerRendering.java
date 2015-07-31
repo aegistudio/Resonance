@@ -13,10 +13,10 @@ import net.aegistudio.resonance.channel.Note;
 import net.aegistudio.resonance.channel.Score;
 import net.aegistudio.resonance.channel.ScoreClip;
 import net.aegistudio.resonance.device.MixerDevice;
+import net.aegistudio.resonance.io.OutputController;
+import net.aegistudio.resonance.io.OutputFacade;
 import net.aegistudio.resonance.music.MusicController;
 import net.aegistudio.resonance.music.ScaleNote;
-import net.aegistudio.resonance.output.OutputController;
-import net.aegistudio.resonance.output.OutputFacade;
 import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.test.util.SineOscillator;
 

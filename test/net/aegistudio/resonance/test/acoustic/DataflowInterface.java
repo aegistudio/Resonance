@@ -9,9 +9,9 @@ import net.aegistudio.resonance.Resonance;
 import net.aegistudio.resonance.dataflow.DataflowFacade;
 import net.aegistudio.resonance.dataflow.DataflowNode;
 import net.aegistudio.resonance.device.MixerDevice;
+import net.aegistudio.resonance.io.OutputController;
+import net.aegistudio.resonance.io.OutputFacade;
 import net.aegistudio.resonance.music.MusicFacade;
-import net.aegistudio.resonance.output.OutputController;
-import net.aegistudio.resonance.output.OutputFacade;
 import net.aegistudio.resonance.serial.Structure;
 
 /**

@@ -2,8 +2,8 @@ package net.aegistudio.resonance;
 
 import net.aegistudio.resonance.dataflow.DataflowFacade;
 import net.aegistudio.resonance.device.OutputDevice;
+import net.aegistudio.resonance.io.OutputFacade;
 import net.aegistudio.resonance.music.MusicFacade;
-import net.aegistudio.resonance.output.OutputFacade;
 /**
  * This class serves as the main entry and master controller of 
  * the whole software.

@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.output;
+package net.aegistudio.resonance.io;
 
 import java.util.TreeMap;
 
@@ -10,15 +10,15 @@ import net.aegistudio.resonance.serial.Structure;
 
 public class OutputController implements OutputFacade
 {
-	protected TreeMap<Integer, Format> formats = new TreeMap<Integer, Format>();
+	protected TreeMap<Integer, OutputFormat> formats = new TreeMap<Integer, OutputFormat>();
 	
 	public OutputController()
 	{
-		Format signedByteFormat = new ByteFormat(true);
+		OutputFormat signedByteFormat = new ByteFormat(true);
 		formats.put(Encoding.BITDEPTH_BIT8 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_LITTLE, signedByteFormat);
 		formats.put(Encoding.BITDEPTH_BIT8 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG, signedByteFormat);
 		
-		Format unsignedByteFormat = new ByteFormat(false);
+		OutputFormat unsignedByteFormat = new ByteFormat(false);
 		formats.put(Encoding.BITDEPTH_BIT8 | Encoding.WORDTYPE_UINT | Encoding.ENDIAN_LITTLE, unsignedByteFormat);
 		formats.put(Encoding.BITDEPTH_BIT8 | Encoding.WORDTYPE_UINT | Encoding.ENDIAN_BIG, unsignedByteFormat);
 		
@@ -44,7 +44,7 @@ public class OutputController implements OutputFacade
 	}
 	
 	OutputDevice outputDevice;
-	Format format;
+	OutputFormat format;
 	byte[] buffer;
 	
 	@Override

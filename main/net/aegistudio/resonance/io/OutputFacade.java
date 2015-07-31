@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.output;
+package net.aegistudio.resonance.io;
 
 import net.aegistudio.resonance.Environment;
 import net.aegistudio.resonance.Frame;
