@@ -4,11 +4,11 @@ Resonance
 
 Introduction
 ------------
-  This repository is intended to provide a cross platform music production environment for music producers, as well as a convenient application programming interface for plugin development. The project is writen in Java, but may be some native code intended for using VST architecture plugins.
+  This repository is intended to provide a cross platform music production environment for music producers, as well as a convenient application programming interface for plugin development. The project is written in Java, but may be some native code intended for using VST architecture plugins.
 
   Music production consists of three phases: the pre-production phase, the production phase, and the post-production phase. In pre-production phase, producers compose music and rehearse band. In the production phase, producers record vocals and instrument performances into computer. In the post-production phase, producers arrange and mix music, master tape the album. Digital Audio Workstation (DAW) is intended for giving a hand to producers in music production.
 
-  As a functioned DAW, the DAW should be able to coordinate the peripherals, record the sounds into the computer, provide a score edit environment to composers, a clip arrange environment to arragers, and a virtual but strong mixing board to the mixers and master-tapers. However, nearly all populated DAWs have developed for twenties or thirties of years, it's hard to alter them and we're not planning to alter them, so please don't compare this DAW to the populated DAWs.
+  As a functioned DAW, the DAW should be able to coordinate the peripherals, record the sounds into the computer, provide a score edit environment to composers, a clip arrange environment to arrangers, and a virtual but strong mixing board to the mixers and master-tapers. However, nearly all populated DAWs have developed for twenties or thirties of years, it's hard to alter them and we're not planning to alter them, so please don't compare this DAW to the populated DAWs.
 
   We welcome music lovers who are interested in developing to join us, that's why I call it 'Resonance'.
 
@@ -34,9 +34,9 @@ Arhitecture
 >                                            |      Process       |
 >                                            +--------------------+
 
-  With these layers, the physic/acoustic flow of the sound is complete. So we all these sublayers the 'acoustic' layers, as they work on time denoted by millisecond, the frequency denoted by hertz, and the amplitude denoted by voltage. But this is not perfect!
+  With these layers, the physic/acoustic flow of the sound is complete. So we all these sub-layers the 'acoustic' layers, as they work on time denoted by millisecond, the frequency denoted by hertz, and the amplitude denoted by voltage. But this is not perfect!
 
-  It's common to see DAW to use measure:beat.position with beats per minute(BPM) to denote time, the note on keyboard (do, re, mi, or actually C1, D2, etc.) to denote pitch, and the velocity and volume to denote loudness. (Be awared, I use pitch instead of frequency, and the loudness instead of amplitude.) Actually, I would like to use these instead of millisecond and hertz as they are familiar to us music producers. And we don't like to control the data flow directly in the software. We would like to see channels and tracks that are for arranging and mixing. So We add one layer called 'music' to the software. In this layer, we use nouns in music domain, and encapsulate the data flow into channels and tracks. Now it's more user friendly!
+  It's common to see DAW to use measure:beat.position with beats per minute(BPM) to denote time, the note on keyboard (do, re, mi, or actually C1, D2, etc.) to denote pitch, and the velocity and volume to denote loudness. (Be aware, I use pitch instead of frequency, and the loudness instead of amplitude.) Actually, I would like to use these instead of millisecond and hertz as they are familiar to us music producers. And we don't like to control the data flow directly in the software. We would like to see channels and tracks that are for arranging and mixing. So We add one layer called 'music' to the software. In this layer, we use nouns in music domain, and encapsulate the data flow into channels and tracks. Now it's more user friendly!
 
 >                                            +--------------------+
 >                                            |        Music       |
@@ -78,7 +78,7 @@ Arhitecture
 >   - Process: Provides Application Programming Interface For Sound Processing, And Process Sound For The Upper Structures.
 >   - Data Flow: Determine How The Data Is Flown In The Software. Render The Sound For Output.
 >   - Output: Format The Sound Into The Format Which Is Compatible With Sound Interface Card Or Audio File.
->   - Music: Abstract The Timing, The Pitch And The Loundness. Encapsulate Data Flow Units Into Channels, Tracks Mixers And So On. Send Events To Plugins.
+>   - Music: Abstract The Timing, The Pitch And The Loudness. Encapsulate Data Flow Units Into Channels, Tracks Mixers And So On. Send Events To Plugins.
 >   - Control: Coordinate The Work Of Lower Structure, Provide Services To Presentation.
 >   - Presentation: Receive User Interactions, Display Critical Software Information.
 
@@ -92,5 +92,5 @@ Acoustic Layers: Input, Process, Output
 
   So we use clamp double in process layer, as well as provided sample rate and channels. The sample rate and channel should keep coherence with the output layer, and the input layer should convert its recorded data into the output format. Now we know that the format should be a global variable for the three modules, and we shall call it the 'acoustic environment'. The acoustic environment is shared along acoustic layers and should not be changed in one taping transation.
 
-  However, the user is granted to change this configuration to match his installed sound interface card (SIC). So a interface configuration dialog should be provided by the present layer to change this configuration. When this config changes, the whole sound system should be resetted.
+  However, the user is granted to change this configuration to match his installed sound interface card (SIC). So a interface configuration dialog should be provided by the present layer to change this configuration. When this configuration changes, the whole sound system should be reseted.
 

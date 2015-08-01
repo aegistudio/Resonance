@@ -51,4 +51,6 @@ public interface KeywordArray<K extends Comparable<K>, V>
 	public Collection<KeywordEntry<K, V>> between(K lowerBound, K upperBound);
 	
 	public Collection<KeywordEntry<K, V>> all();
+	
+	public boolean hasUpdated(Object questioner);
 }

@@ -1,6 +1,7 @@
 package net.aegistudio.resonance.channel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.aegistudio.resonance.KeywordArray.KeywordEntry;
 import net.aegistudio.resonance.LengthKeywordArray;
@@ -39,6 +40,7 @@ public class ScoreClip implements Clip
 				scoreMonitor = scoreEntry.getValue().getLengthMonitor();
 			}
 			else scoreMonitor = null;
+			trimmed = true;
 		}
 	}
 	
@@ -54,11 +56,12 @@ public class ScoreClip implements Clip
 		scoreClip.trim(clipLength, innerOffset);
 		return scoreClip;
 	}
-	
+	boolean trimmed;
 	public void trim(double clipLength, double innerOffset)
 	{
 		this.clipLength = clipLength;
 		this.innerOffset = innerOffset;
+		trimmed = true;
 	}
 	
 	@Override
@@ -139,4 +142,20 @@ public class ScoreClip implements Clip
 			this.scoreMonitor.reset();
 	}
 
+	Collection<KeywordEntry<Double, Note>> notes;
+	public Collection<KeywordEntry<Double, Note>> getNotes()
+	{
+		if(this.scoreEntry != null)
+		{
+			if(this.scoreEntry.getValue().getAllNotes().hasUpdated(this)
+					|| trimmed)
+			{
+				notes = this.scoreEntry.getValue().getAllNotes()
+							.between(- innerOffset, - innerOffset + getLength());
+				trimmed = true;
+			}
+			return notes;
+		}
+		else return null;
+	}
 }

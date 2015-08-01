@@ -124,4 +124,9 @@ public class LengthKeywordArray<T extends LengthObject> implements KeywordArray<
 	public double getMaximun(){
 		return maximum;
 	}
+
+	@Override
+	public boolean hasUpdated(Object questioner) {
+		return innerArray.hasUpdated(questioner);
+	}
 }

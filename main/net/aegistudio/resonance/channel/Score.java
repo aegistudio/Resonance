@@ -39,6 +39,11 @@ public class Score implements SerializedObject
 	public void removeNote(KeywordEntry<Double, Note> entry)
 	{
 		this.notes.remove(entry);
+		scoreLength = 0;
+		double newScoreLength;
+		for(KeywordEntry<Double, Note> note : notes.all())
+			if((newScoreLength = note.getKeyword() + note.getValue().getLength()) > scoreLength)
+				scoreLength = newScoreLength;
 	}
 	
 	public KeywordArray<Double, Note> getAllNotes()

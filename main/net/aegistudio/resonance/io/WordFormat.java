@@ -2,7 +2,7 @@ package net.aegistudio.resonance.io;
 
 import net.aegistudio.resonance.Frame;
 
-public class WordFormat implements OutputFormat, InputFormat
+public class WordFormat extends Format implements OutputFormat, InputFormat
 {
 
 	public boolean bigEndian;

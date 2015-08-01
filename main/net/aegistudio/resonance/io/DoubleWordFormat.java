@@ -2,7 +2,7 @@ package net.aegistudio.resonance.io;
 
 import net.aegistudio.resonance.Frame;
 
-public class DoubleWordFormat implements OutputFormat, InputFormat{
+public class DoubleWordFormat extends Format implements OutputFormat, InputFormat{
 	public boolean bigEndian;
 	public boolean signed;
 	

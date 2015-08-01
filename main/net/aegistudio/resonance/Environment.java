@@ -29,6 +29,24 @@ public class Environment
 		this.prerenderFactor = prerenderFactor;
 	}
 	
+	public Environment(AudioFormat format, int samplesPerFrame, int prerenderFactor)
+	{
+		this.sampleRate = format.getSampleRate();
+		this.channels = format.getChannels();
+		AudioFormat.Encoding encoding = format.getEncoding();
+		
+		int wordType = 0;
+		if(encoding.equals(AudioFormat.Encoding.PCM_SIGNED)) wordType = Encoding.WORDTYPE_INT;
+		else if(encoding.equals(AudioFormat.Encoding.PCM_UNSIGNED)) wordType = Encoding.WORDTYPE_UINT;
+		else if(encoding.equals(AudioFormat.Encoding.PCM_FLOAT)) wordType = Encoding.WORDTYPE_FLOAT;
+		
+		this.wordEncoding = new Encoding((format.isBigEndian()? Encoding.ENDIAN_BIG : Encoding.ENDIAN_LITTLE)
+									| wordType | format.getSampleSizeInBits());
+		
+		this.samplesPerFrame = samplesPerFrame;
+		this.prerenderFactor = prerenderFactor;
+	}
+	
 	public int getByteBufferSize()
 	{
 		return this.wordEncoding.getWordLength() / 8 * channels * this.samplesPerFrame;

@@ -2,7 +2,7 @@ package net.aegistudio.resonance.io;
 
 import net.aegistudio.resonance.Frame;
 
-public class ByteFormat implements OutputFormat, InputFormat
+public class ByteFormat extends Format implements OutputFormat, InputFormat
 {
 	public boolean signed;
 	

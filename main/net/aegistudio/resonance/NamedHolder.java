@@ -11,7 +11,7 @@ import net.aegistudio.resonance.serial.Type;
 
 /** In order to implements retrieve by name **/
 
-public abstract class NamedHolder<T extends SerializedObject> implements SerializedObject
+public abstract class NamedHolder<T extends SerializedObject> implements SerializedObject, Updatable
 {
 	protected final String alreadyExists;
 	protected final String notExists;

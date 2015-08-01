@@ -2,6 +2,7 @@ package net.aegistudio.resonance;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,6 +23,7 @@ public class RoundedKeywordArray<T> implements KeywordArray<Double, T>
 		if((entry = entries.get(keyword)) == null)
 			entries.put(keyword, entry = new ArrayList<KeywordEntry<Double, T>>());
 		entry.add(adding);
+		synchronized(this.updated){	updated.clear();	}
 	}
 
 	@Override
@@ -30,6 +32,7 @@ public class RoundedKeywordArray<T> implements KeywordArray<Double, T>
 		List<KeywordEntry<Double, T>> entry;
 		if((entry = entries.get(keyword)) != null)
 			entry.remove(removing);
+		synchronized(this.updated){	updated.clear();	}
 	}
 
 	@Override
@@ -60,6 +63,21 @@ public class RoundedKeywordArray<T> implements KeywordArray<Double, T>
 		for(List<KeywordEntry<Double, T>> entry : this.entries.values())
 			if(entry != null) buffer.addAll(entry);
 		return buffer;
+	}
+
+	protected final HashSet<Object> updated = new HashSet<Object>();
+	
+	@Override
+	public boolean hasUpdated(Object questioner) {
+		synchronized(this.updated)
+		{
+			if(!updated.contains(questioner))
+			{
+				updated.add(questioner);
+				return true;
+			}
+			else return false;
+		}
 	}
 	
 	
