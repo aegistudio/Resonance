@@ -1,27 +1,33 @@
 package net.aegistudio.resonance.io.midi;
 
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.ShortMessage;
+
 import net.aegistudio.resonance.music.NoteOnEvent;
 
-public class NoteOnProxy implements MidiEventProxy<NoteOnEvent>
+public class NoteOnProxy implements MidiEventProxy<NoteOnEvent, ShortMessage>
 {
 	@Override
-	public NoteOnEvent decapsulate(byte[] midiMessage) {
-		byte pitch = midiMessage[1];
-		byte velocity = midiMessage[2];
+	public NoteOnEvent decapsulate(ShortMessage midiMessage) {
+		byte pitch = (byte) midiMessage.getData1();
+		byte velocity = (byte) midiMessage.getData2();
 		return new NoteOnEvent(pitch, velocity, 0);
 	}
 
 	@Override
-	public byte[] encapsulate(NoteOnEvent internalEvent) {
-		byte[] noteOnEvent = new byte[3];
-		noteOnEvent[0] = getEventCode();
-		noteOnEvent[1] = internalEvent.note;
-		noteOnEvent[2] = internalEvent.velocity;
-		return noteOnEvent;
+	public ShortMessage encapsulate(NoteOnEvent internalEvent) {
+		try {
+			ShortMessage noteOnEvent = new ShortMessage();
+			noteOnEvent.setMessage(getEventCode(), internalEvent.note, internalEvent.velocity);
+			return noteOnEvent;
+		} catch (InvalidMidiDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
-	public byte getEventCode() {
-		return (byte) 0x90;
+	public int getEventCode() {
+		return ShortMessage.NOTE_ON;
 	}
 }

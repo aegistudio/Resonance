@@ -1,11 +1,13 @@
 package net.aegistudio.resonance.io.midi;
 
+import javax.sound.midi.MidiMessage;
+
 import net.aegistudio.resonance.plugin.Event;
 
-public interface MidiEventProxy<E extends Event> {
-	public E decapsulate(byte[] midiMessage);
+public interface MidiEventProxy<E extends Event, M extends MidiMessage> {
+	public E decapsulate(M midiMessage);
 	
-	public byte[] encapsulate(E internalEvent);
+	public M encapsulate(E internalEvent);
 	
-	public byte getEventCode();
+	public int getEventCode();
 }
