@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Resonance" default="main">
+	<property name="dir.src" value="vst"/>
+	<property name="ps" value="${path.separator}"/>
+	<property name="fs" value="${file.separator}"/>
+	<property name="loader" value="${dir.src}${fs}vstloader.cpp"/>
+	
+	<!-- See also the vstloader.property.pattern for information. -->
+	<property file="${basedir}${fs}vstloader.properties"/>
+	
+	<target name="main">
+		<!-- make sure included file has already been loaded! -->
+		<antcall target="include"/>
+		
+		<!-- compile the code -->
+		<exec executable="${windows.cl}">
+			<arg value="${loader}"/>
+			
+			<!-- include vst -->
+			<arg value="/I"/>
+			<arg value="${dir.src}"/>
+			
+			<!-- include vst/include -->
+			<arg value="/I"/>
+			<arg value="${dir.src}${fs}include"/>
+			
+			<arg value="-GX"/>
+		</exec>
+	</target>
+	
+	<target name="include">
+		<available file="${dir.src}${fs}include${fs}pluginterfaces" 
+			property="include.pluginterfaces.exists"/>
+		<antcall target="include.pluginterfaces"/>
+		
+		<available file="${dir.src}${fs}include${fs}public.sdk" 
+			property="include.public.sdk.exists"/>
+		<antcall target="include.public.sdk"/>
+	</target>
+	
+	<!-- pluginterfaces -->
+	<property name="pluginterface.url" value="${vst.library.path}/pluginterfaces/vst2.x"/>
+	<property name="pluginterface.dst" value="${dir.src}${fs}include${fs}pluginterfaces${fs}vst2.x"/>
+	
+	<target name="include.pluginterfaces" unless="include.pluginterfaces.exists">
+		<mkdir dir="${pluginterface.dst}"/>
+		
+		<!-- pluginterfaces/vst2.x/aeffect.h -->
+		<get src="${pluginterface.url}/aeffect.h" 
+			dest="${pluginterface.dst}${fs}aeffect.h" 
+			verbose="true"/>
+		
+		<!-- pluginterfaces/vst2.x/aeffectx.h -->
+		<get src="${pluginterface.url}/aeffectx.h" 
+			dest="${pluginterface.dst}${fs}aeffectx.h" 
+			verbose="true"/>
+		
+		<!-- pluginterfaces/vst2.x/vstfxstore.h -->
+		<get src="${pluginterface.url}/vstfxstore.h" 
+			dest="${pluginterface.dst}${fs}vstfxstore.h" 
+			verbose="true"/>
+	</target>
+	
+	<!-- public.sdk -->
+	<property name="public.sdk.url" value="${vst.library.path}/public.sdk/source/vst2.x"/>
+	<property name="public.sdk.dst" value="${dir.src}${fs}include${fs}public.sdk${fs}source${fs}vst2.x"/>
+	
+	<target name="include.public.sdk" unless="include.public.sdk.exists">
+		<mkdir dir="${public.sdk.dst}"/>
+		
+		<!-- public.sdk/source/vst2.x/aeffeditor.h-->
+		<get src="${public.sdk.url}/aeffeditor.h" 
+			dest="${public.sdk.dst}${fs}aeffeditor.h" 
+			verbose="true"/>
+		
+		<!-- public.sdk/source/vst2.x/audioeffect.h-->
+		<get src="${public.sdk.url}/audioeffect.h" 
+			dest="${public.sdk.dst}${fs}audioeffect.h" 
+			verbose="true"/>
+		
+		<!-- public.sdk/source/vst2.x/audioeffect.cpp-->
+		<get src="${public.sdk.url}/audioeffect.cpp" 
+			dest="${public.sdk.dst}${fs}audioeffect.cpp" 
+			verbose="true"/>
+		
+		<!-- public.sdk/source/vst2.x/audioeffectx.h-->
+		<get src="${public.sdk.url}/audioeffectx.h" 
+			dest="${public.sdk.dst}${fs}audioeffectx.h" 
+			verbose="true"/>
+		
+		<!-- public.sdk/source/vst2.x/audioeffectx.cpp-->
+		<get src="${public.sdk.url}/audioeffectx.cpp" 
+			dest="${public.sdk.dst}${fs}audioeffectx.cpp" 
+			verbose="true"/>
+		
+		<!-- public.sdk/source/vst2.x/vstplugmain.cpp-->
+		<get src="${public.sdk.url}/vstplugmain.cpp" 
+			dest="${public.sdk.dst}${fs}vstplugmain.cpp" 
+			verbose="true"/>
+	</target>
+	
+</project>
