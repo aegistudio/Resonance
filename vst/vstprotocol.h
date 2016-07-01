@@ -8,12 +8,15 @@
 typedef AEffect* (*PluginMain) (audioMasterCallback);
 
 //@section error return code
-#define ERROR_NONE 			0
-#define ERROR_VST_UNSPECIFIED 		1
-#define ERROR_VST_LOADFAIL		2
-#define ERROR_VST_NOENTRY		3
-#define ERROR_VST_NOINSTANCE		4
-#define ERROR_PROTOCOL_UNDEFINED	5
+enum ErrorCode {
+	ERROR_NONE = 0,	
+	ERROR_IO_NOTBINARY,
+	ERROR_VST_UNSPECIFIED, 	
+	ERROR_VST_LOADFAIL,
+	ERROR_VST_NOENTRY,
+	ERROR_VST_NOINSTANCE,
+	ERROR_PROTOCOL_UNDEFINED,
+};
 //@endsection
 
 // when metadata flag set to true.
@@ -32,22 +35,42 @@ struct Metadata {
 #define PROTOCOL_OUT_BYE		1	// when the program is terminated.
 
 //@section inprotocol
-#define PROTOCOL_IN_BYE 		0	// terminate the current program.
-// Input: None
-// Output: None
+enum ProtocolIn {
+	PROTOCOL_IN_BYE = 0,		// terminate the current program.
+	// Input: None
+	// Output: void
 
-#define PROTOCOL_IN_METADATA		1	// we will update the metadata.
+	PROTOCOL_IN_METADATA,		// we will update the metadata.
+	// Input: struct Metadata
+	// Output: void
 
-#define PROTOCOL_IN_PROCESS		2	// start processing.
-// Input: The Input Buffer
-#define PROTOCOL_IN_EMPTY_PROCESS	3	// the input will be empty.
-// Input: None
-// Output: The Output Buffer
+	PROTOCOL_IN_PROCESS,		// start processing.
+	// Input: The Input Buffer
+	// Output: The Output Buffer
 
-#define PROTOCOL_MAX			4	
+	PROTOCOL_IN_EMPTY_PROCESS,	// the input will be empty.
+	// Input: None
+	// Output: The Output Buffer
 
-typedef int (*ProtocolHandle)(AEffect* effect);	// the handler.
-ProtocolHandle handles[PROTOCOL_MAX];
+	PROTOCOL_IN_OPEN,		// start the effect.
+	PROTOCOL_IN_CLOSE,		// end the effect.
+	PROTOCOL_IN_SUSPEND,		// suspend the effect.
+	PROTOCOL_IN_RESUME,		// resume the effect.
+	// Input: None
+	// Output: None
+
+	PROTOCOL_IN_LISTPARAMS,		// list the parameters.
+	// Input: None
+	// Output: 
+	// 	numParams : Int {
+	//		paramValue: float,
+	//		paramLabel: char buffer,
+	//		paramDisplay: char buffer,
+	//		paramName: char buffer.
+	//	} x numParams
+
+	PROTOCOL_MAX
+};
 //@endsection
 
 // return void
@@ -70,6 +93,27 @@ int wrong(int code) {
 	putchar(PROTOCOL_OUT_BYE);
 	putchar(code);
 	return code;
+}
+
+// force little endian.
+void writeInt(int value) {
+	putchar((value >> 24) & 0x0ff);
+	putchar((value >> 16) & 0x0ff);
+	putchar((value >>  8) & 0x0ff);
+	putchar((value >>  0) & 0x0ff);
+}
+
+void writeString(char* buffer) {
+	int length = strlen(buffer);
+	writeInt(length);
+	fwrite(buffer, length, 1, stdout);
+	fflush(stdout);
+}
+
+void writeFloat(float value) {
+	float* address = &value;
+	int* converted = (int*)address;
+	writeInt(*converted);
 }
 
 #endif

@@ -35,15 +35,14 @@ public class VstFactory {
 	}
 	
 	public static void main(String[] arguments) throws Exception {
+
 		VstPlugin plugin = new VstFactory().create(
 				"C:\\Program Files\\Image-Line\\FL Studio 12.1\\Plugins\\VST\\Fruity Reeverb.dll");
+		
+		long mills = System.currentTimeMillis();
 		plugin.create(null);
 		
-		VstPlugin plugin2 = new VstFactory().create(
-				"C:\\Program Files\\Image-Line\\FL Studio 12.1\\Plugins\\VST\\Fruity Reeverb.dll");
-		plugin2.create(null);
-		
 		plugin.destroy();
-		plugin2.destroy();
+		System.out.println(System.currentTimeMillis() - mills);
 	}
 }

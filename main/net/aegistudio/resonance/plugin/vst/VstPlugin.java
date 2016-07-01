@@ -1,5 +1,6 @@
 package net.aegistudio.resonance.plugin.vst;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +23,8 @@ public class VstPlugin implements Plugin {
 	public InputStream processOutput, processError;
 	public OutputStream processInput;
 	
+	public VstParameter[] paramList;
+	
 	@Override
 	public void create(Structure parameter) throws VstException {
 		try {
@@ -39,8 +42,25 @@ public class VstPlugin implements Plugin {
 		}
 		
 		operate((i, o, e) -> ensureInput());
+		
+		operate((i, o, e) -> {
+			EnumOperation.OPEN.write(o);
+			ensureInput();
+		});
+		
+		operate((i, o, e) -> {
+			EnumOperation.LIST_PARAMS.write(o);
+			ensureInput();
+			
+			DataInputStream din = new DataInputStream(i);
+			int paramCount = din.readInt();
+			paramList = new VstParameter[paramCount];
+			
+			for(int j = 0; j < paramCount; j ++) 
+				paramList[j] = new VstParameter(j, this, i);
+		});
 	}
-
+	
 	@Override
 	public void trigger(Event event) {
 		
@@ -53,7 +73,12 @@ public class VstPlugin implements Plugin {
 
 	@Override
 	public void destroy() throws VstException {
-		operate((i, o, e) -> o.write(EnumOperation.TERMINATE.ordinal()));
+		operate((i, o, e) -> {
+			EnumOperation.CLOSE.write(o);
+			ensureInput();
+		});
+		
+		operate((i, o, e) -> EnumOperation.TERMINATE.write(o));
 		abandon();
 	}
 	

@@ -1,9 +1,10 @@
-#include <windows.h>
-#include <iostream>
+#define VST_2_4_EXTENSIONS 1
 
+#include "windows.h"
 #include "stdio.h"
+#include "fcntl.h"
+#include "io.h"
 #include "vstprotocol.h"
-using namespace std;
 
 Metadata metadata;
 
@@ -45,7 +46,7 @@ int dllMain(HINSTANCE vsthandle) {
 	while((inputHandleCode = getchar()) != PROTOCOL_IN_BYE) {
 		if(inputHandleCode < 0 || inputHandleCode >= PROTOCOL_MAX) 
 			returnCode = ERROR_PROTOCOL_UNDEFINED;
-		else returnCode = handles[inputHandleCode](effectInstance);
+		else returnCode = handles2x[inputHandleCode](effectInstance);
 
 		if(returnCode != ERROR_NONE) break;
 	}
@@ -56,9 +57,15 @@ int dllMain(HINSTANCE vsthandle) {
 }
 
 int main(int argv, char** args) {
+	// Set stdin, stdout to binary mode.
+	if((_setmode(_fileno(stdin), _O_BINARY)) == -1)
+		return wrong(ERROR_IO_NOTBINARY);
+	if((_setmode(_fileno(stdout), _O_BINARY)) == -1)
+		return wrong(ERROR_IO_NOTBINARY);
+
 	// Check whether library specified.
 	if(argv <= 1) return wrong(ERROR_VST_UNSPECIFIED);
-	loadHandle();
+	loadHandles2x();
 
 	// Initialize metadata.
 	metadata.masterVersion = 2400;

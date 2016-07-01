@@ -9,6 +9,8 @@ package net.aegistudio.resonance.plugin.vst;
 public enum EnumErrorCode {
 	NONE,
 	
+	IO_NOT_BINARY,
+	
 	VST_UNSPECIFIED,
 	VST_LOADFAIL("Specified file is not a valid DLL."),
 	VST_NOENTRY("Specified file is not a vst plugin."),
