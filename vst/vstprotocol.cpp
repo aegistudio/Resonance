@@ -15,14 +15,27 @@ int readMetadata(AEffect*) {
 
 // PROTOCOL_IN_EMPTY_PROCESS
 int processCore(AEffect* effect) {
+	int i = 0; //Iterable variant.
+
 	// Call the actual effect plugin.
-	if(metadata.processDouble) 
+	if(metadata.processDouble) {
+		for(i = 0; i < bufferSize; i ++) 
+			reverseBitOrder(doubleInputChannel + i, sizeof(double));
 		effect -> processDoubleReplacing(effect, 
 			doubleInputChannel, doubleOutputChannel, 
 			metadata.sampleFrames);
-	else effect -> processReplacing(effect, 
+		for(i = 0; i < bufferSize; i ++) 
+			reverseBitOrder(doubleOutputChannel + i, sizeof(double));
+	}
+	else {
+		for(i = 0; i < bufferSize; i ++) 
+			reverseBitOrder(floatInputChannel + i, sizeof(float));
+		effect -> processReplacing(effect, 
 			floatInputChannel, floatOutputChannel, 
 			metadata.sampleFrames);
+		for(i = 0; i < bufferSize; i ++) 
+			reverseBitOrder(floatOutputChannel + i, sizeof(float));
+	}
 
 	// Write output buffer to standard output.
 	return write(outputBuffer, bufferSize, 1);
@@ -86,6 +99,41 @@ int listParams(AEffect* effect) {
 	return ERROR_NONE;
 }
 
+int setParam(AEffect* effect) {
+	int paramId;		readInt(&paramId);
+	float paramValue;	readFloat(&paramValue);	
+
+	effect -> setParameter(effect, paramId, paramValue);
+	
+	ready();
+	char display[kVstMaxParamStrLen + 1];
+	display[kVstMaxParamStrLen] = 0;
+
+	effect -> dispatcher(effect, effGetParamDisplay, paramId, 0, display, 0);
+	writeString(display);
+	fflush(stdout);
+
+	return ERROR_NONE;
+}
+
+int getParam(AEffect* effect) {
+	int paramId;		readInt(&paramId);
+
+	ready();
+
+	float paramValue = effect -> getParameter(effect, paramId);
+	writeFloat(paramValue);
+
+	char display[kVstMaxParamStrLen + 1];
+	display[kVstMaxParamStrLen] = 0;
+
+	effect -> dispatcher(effect, effGetParamDisplay, paramId, 0, display, 0);
+	writeString(display);
+	fflush(stdout);
+
+	return ERROR_NONE;
+}
+
 void loadHandles2x() {
 	handles2x[PROTOCOL_IN_METADATA] = readMetadata;
 
@@ -98,6 +146,8 @@ void loadHandles2x() {
 	handles2x[PROTOCOL_IN_RESUME] = effectSuspend;
 
 	handles2x[PROTOCOL_IN_LISTPARAMS] = listParams;
+	handles2x[PROTOCOL_IN_SETPARAM] = setParam;
+	handles2x[PROTOCOL_IN_GETPARAM] = getParam;
 }
 
 #endif

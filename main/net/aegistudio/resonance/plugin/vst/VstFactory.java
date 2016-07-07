@@ -42,6 +42,10 @@ public class VstFactory {
 		long mills = System.currentTimeMillis();
 		plugin.create(null);
 		
+		plugin.paramList[0].setValue(0.9f);
+		System.out.println(plugin.paramList[0].getValue());
+		System.out.println(plugin.paramList[0].getDisplay());
+		
 		plugin.destroy();
 		System.out.println(System.currentTimeMillis() - mills);
 	}

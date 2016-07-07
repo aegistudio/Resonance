@@ -62,12 +62,26 @@ enum ProtocolIn {
 	PROTOCOL_IN_LISTPARAMS,		// list the parameters.
 	// Input: None
 	// Output: 
-	// 	numParams : Int {
+	// 	numParams : int {
 	//		paramValue: float,
 	//		paramLabel: char buffer,
 	//		paramDisplay: char buffer,
 	//		paramName: char buffer.
 	//	} x numParams
+
+	PROTOCOL_IN_SETPARAM,		// set a parameter.
+	// Input: 
+	//	paramId : int
+	// 	value: float
+	// Output: 
+	// 	paramDisplay : char buffer
+
+	PROTOCOL_IN_GETPARAM,		// get a parameter.
+	// Input:
+	//	paramId: int
+	// Output:
+	//	value: float
+	// 	paramDisplay: char buffer.
 
 	PROTOCOL_MAX
 };
@@ -103,9 +117,22 @@ void writeInt(int value) {
 	putchar((value >>  0) & 0x0ff);
 }
 
+void writeShort(short value) {
+	putchar((value >>  8) & 0x0ff);
+	putchar((value >>  0) & 0x0ff);
+}
+
+void readInt(int* value) {
+	*value = 0;
+	*value |= (getchar() & 0x0ff) << 24;
+	*value |= (getchar() & 0x0ff) << 16;
+	*value |= (getchar() & 0x0ff) <<  8;
+	*value |= (getchar() & 0x0ff) <<  0;
+}
+
 void writeString(char* buffer) {
-	int length = strlen(buffer);
-	writeInt(length);
+	short length = strlen(buffer);
+	writeShort(length);
 	fwrite(buffer, length, 1, stdout);
 	fflush(stdout);
 }
@@ -114,6 +141,21 @@ void writeFloat(float value) {
 	float* address = &value;
 	int* converted = (int*)address;
 	writeInt(*converted);
+}
+
+void readFloat(float* target) {
+	int* address = (int*)target;
+	readInt(address);
+}
+
+#define MAX_BIT_LENGTH 16
+void reverseBitOrder(void* address, int length) {
+	char* converted = (char*)address;
+	char buffer[MAX_BIT_LENGTH];
+	int i = 0; for(; i < length; i ++) 
+		buffer[i] = converted[i];
+	int j = 0; for(; j < length; j ++)
+		converted[j] = buffer[length - j - 1];
 }
 
 #endif

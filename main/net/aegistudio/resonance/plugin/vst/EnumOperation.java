@@ -21,7 +21,9 @@ public enum EnumOperation {
 	SUSPEND,
 	RESUME,
 	
-	LIST_PARAMS;
+	LIST_PARAMS,
+	SET_PARAM,
+	GET_PARAM;
 	
 	public void write(OutputStream output) throws IOException {
 		output.write(ordinal());
