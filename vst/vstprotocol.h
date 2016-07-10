@@ -15,6 +15,8 @@ enum ErrorCode {
 	ERROR_VST_LOADFAIL,
 	ERROR_VST_NOENTRY,
 	ERROR_VST_NOINSTANCE,
+	ERROR_WND_REGISTER,
+	ERROR_WND_CREATE,
 	ERROR_PROTOCOL_UNDEFINED,
 };
 //@endsection
@@ -83,9 +85,31 @@ enum ProtocolIn {
 	//	value: float
 	// 	paramDisplay: char buffer.
 
+	PROTOCOL_IN_FLAGS,		// get the flag.
+	// Input: None
+	// Output:
+	//	flags: int
+
+	PROTOCOL_IN_OPEN_EDITOR,	// open an editor.
+	// Input: None
+	// Output: None
+
+	PROTOCOL_IN_CLOSE_EDITOR,	// close an editor.
+	// Input: None
+	// Output: None
+
+	PROTOCOL_IN_IS_EDITOR_OPEN,	// is editor opened.
+	// Input: None
+	// Output: byte
+	// 	0 for false and 1 for true.
+
 	PROTOCOL_MAX
 };
 //@endsection
+
+
+typedef int (*ProtocolHandle)(AEffect* effect);	// the handler.
+ProtocolHandle handles[PROTOCOL_MAX];
 
 // return void
 int ready() {

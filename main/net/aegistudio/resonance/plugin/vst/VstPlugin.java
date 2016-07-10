@@ -25,6 +25,13 @@ public class VstPlugin implements Plugin {
 	
 	public VstParameter[] paramList;
 	
+	// The flags.
+	public boolean hasEditor;			public static final int HAS_EDITOR_MASK = 1 << 0;
+	public boolean canReplacing;		public static final int CAN_REPLACINg_MASK = 1 << 4;
+	public boolean programChunks;		public static final int PROGRAM_CHUNKS_MASK = 1 << 5;
+	public boolean isSynth;				public static final int IS_SYNTH = 1 << 8;
+	public boolean canDoubleReplacing;	public static final int CAN_DOUBLE_REPLACING_MASK = 1 << 12;
+	
 	@Override
 	public void create(Structure parameter) throws VstException {
 		try {
@@ -43,6 +50,18 @@ public class VstPlugin implements Plugin {
 		
 		operate((i, o, e) -> ensureInput());
 		
+		operate((i, o, e) -> {
+			EnumOperation.FLAGS.write(o);
+			ensureInput();
+			int flags = new DataInputStream(i).readInt();
+			
+			hasEditor = (flags & HAS_EDITOR_MASK) != 0;
+			canReplacing = (flags & CAN_REPLACINg_MASK) != 0;
+			programChunks = (flags & PROGRAM_CHUNKS_MASK) != 0;
+			isSynth = (flags & IS_SYNTH) != 0;
+			canDoubleReplacing = (flags & CAN_DOUBLE_REPLACING_MASK) != 0;			
+		});
+
 		operate((i, o, e) -> {
 			EnumOperation.OPEN.write(o);
 			ensureInput();
@@ -70,9 +89,38 @@ public class VstPlugin implements Plugin {
 	public void process(Frame input, Frame output) {
 		
 	}
+	
+	public void openEditor() throws VstException {
+		if(hasEditor)
+			operate((i, o, e) -> {
+				EnumOperation.OPEN_EDITOR.write(o);
+				ensureInput();
+			});
+	}
 
+	public void closeEditor() throws VstException {
+		if(hasEditor)
+			operate((i, o, e) -> {
+				EnumOperation.CLOSE_EDITOR.write(o);
+				ensureInput();
+			});
+	}
+	
+	public boolean isEditorOpen() throws VstException {
+		if(hasEditor) {
+			return operateFunc((i, o, e) -> {
+				EnumOperation.IS_EDITOR_OPEN.write(o);
+				ensureInput();
+				return i.read() == 1;
+			});
+		}
+		return false;
+	}
+	
 	@Override
 	public void destroy() throws VstException {
+		if(isEditorOpen()) closeEditor();
+		
 		operate((i, o, e) -> {
 			EnumOperation.CLOSE.write(o);
 			ensureInput();
@@ -80,6 +128,7 @@ public class VstPlugin implements Plugin {
 		
 		operate((i, o, e) -> EnumOperation.TERMINATE.write(o));
 		abandon();
+
 	}
 	
 	protected void abandon() {
@@ -87,16 +136,24 @@ public class VstPlugin implements Plugin {
 		this.process = null;
 	}
 	
-	public static interface Operation {
+	public static interface Operation<T> {
+		public T communicate(InputStream input, OutputStream output, 
+				InputStream error) throws VstException, IOException;
+	}
+	
+	public static interface OperationVoid {
 		public void communicate(InputStream input, OutputStream output, 
 				InputStream error) throws VstException, IOException;
 	}
 	
-	public void operate(Operation todo) throws VstException {
+	public synchronized <T> T operateFunc(Operation<T> todo) throws VstException {
 		try {
-			if(process == null) return;	// already terminated.
+			if(process == null) return null;	// already terminated.
 			if(!process.isAlive()) throw new IOException();
-			todo.communicate(processOutput, processInput, processError);
+
+			synchronized(this) {
+				return todo.communicate(processOutput, processInput, processError);
+			}
 		}
 		catch(IOException io) {
 			abandon();
@@ -106,6 +163,13 @@ public class VstPlugin implements Plugin {
 			abandon();
 			throw ex;
 		}
+	}
+	
+	public void operate(OperationVoid todo) throws VstException {
+		operateFunc((i, o, e) -> {
+			todo.communicate(i, o, e);
+			return null;
+		});
 	}
 	
 	public void ensureInput() throws VstException{

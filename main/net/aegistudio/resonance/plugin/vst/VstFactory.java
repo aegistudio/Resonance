@@ -37,16 +37,49 @@ public class VstFactory {
 	public static void main(String[] arguments) throws Exception {
 
 		VstPlugin plugin = new VstFactory().create(
-				"C:\\Program Files\\Image-Line\\FL Studio 12.1\\Plugins\\VST\\Fruity Reeverb.dll");
-		
-		long mills = System.currentTimeMillis();
+			//	"C:\\Program Files\\Image-Line\\FL Studio 12.1\\Plugins\\VST\\Fruity Reeverb.dll");
+				"Z:\\home\\luohaoran\\vst.plugin\\TruePianos.dll");
 		plugin.create(null);
 		
-		plugin.paramList[0].setValue(0.9f);
-		System.out.println(plugin.paramList[0].getValue());
-		System.out.println(plugin.paramList[0].getDisplay());
+		if(plugin.hasEditor) {
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			System.out.println(plugin.isEditorOpen());
+		}
+		Thread.sleep(1000L);
+		
+
+		if(plugin.hasEditor)
+			plugin.closeEditor();
+		
+		Thread.sleep(1000L);
+		if(plugin.hasEditor) {
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			plugin.openEditor();
+			System.out.println(plugin.isEditorOpen());
+		}
+		Thread.sleep(1000L);
+		
+		long mills;
+		for(int i = 0; i < 10; i ++) {
+			mills = System.nanoTime();
+			plugin.paramList[0].setValue(i * .1f);
+			System.out.println(plugin.paramList[0].getValue());
+			System.out.println(plugin.paramList[0].getDisplay());
+			System.out.println("Mills: " + (System.nanoTime() - mills) / 1.e6);
+			
+			Thread.sleep(100L);
+		}
+
+		if(plugin.hasEditor)
+			plugin.closeEditor();
 		
 		plugin.destroy();
-		System.out.println(System.currentTimeMillis() - mills);
 	}
 }

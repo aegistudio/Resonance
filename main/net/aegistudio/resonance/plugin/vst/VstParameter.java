@@ -24,11 +24,6 @@ public class VstParameter {
 		this.display = dataInput.readUTF();
 		this.name = dataInput.readUTF();
 		this.value = dataInput.readFloat();
-		
-		System.out.println("Label: " + label);
-		System.out.println("Name: " + name);
-		System.out.println("Display: " + display);
-		System.out.println("Value: " + value);
 	}
 	
 	public void setValue(float newValue) {

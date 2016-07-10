@@ -2,9 +2,13 @@
 #define __VST_PROTOCOL_CPP__
 
 #include "vstprotocol.h"
+#define MAX_VST_PARAMSIZE 128
 
-typedef int (*ProtocolHandle)(AEffect* effect);	// the handler.
-ProtocolHandle handles2x[PROTOCOL_MAX];
+#pragma comment(lib, "ole32.lib")
+
+HWND windowHandle = NULL;
+HINSTANCE handle = NULL;
+CRITICAL_SECTION threadCritSection;
 
 // PROTOCOL_IN_METADATA
 int readMetadata(AEffect*) {
@@ -71,12 +75,13 @@ int effectResume(AEffect* effect) {
 	return ready();
 }
 
+// PROTOCOL_IN_*_PARAM
 int listParams(AEffect* effect) {
 	ready();
 	writeInt(effect -> numParams);
 
-	char buffer[kVstMaxParamStrLen + 1];
-	buffer[kVstMaxParamStrLen] = 0;
+	char buffer[MAX_VST_PARAMSIZE];
+	buffer[MAX_VST_PARAMSIZE - 1] = 0;
 
 	int i = 0; for(; i < effect -> numParams; i ++) {
 		// Label
@@ -98,6 +103,7 @@ int listParams(AEffect* effect) {
 
 	return ERROR_NONE;
 }
+
 
 int setParam(AEffect* effect) {
 	int paramId;		readInt(&paramId);
@@ -134,20 +140,165 @@ int getParam(AEffect* effect) {
 	return ERROR_NONE;
 }
 
-void loadHandles2x() {
-	handles2x[PROTOCOL_IN_METADATA] = readMetadata;
+// PROTOCOL_IN_GET_FLAGS
+int getFlags(AEffect* effect) {
+	ready();
 
-	handles2x[PROTOCOL_IN_PROCESS] = processInput;
-	handles2x[PROTOCOL_IN_EMPTY_PROCESS] = processCore;
+	writeInt(effect -> flags);
+	fflush(stdout);
 
-	handles2x[PROTOCOL_IN_OPEN] = effectOpen;
-	handles2x[PROTOCOL_IN_CLOSE] = effectClose;
-	handles2x[PROTOCOL_IN_SUSPEND] = effectSuspend;
-	handles2x[PROTOCOL_IN_RESUME] = effectSuspend;
+	return ERROR_NONE;
+}
 
-	handles2x[PROTOCOL_IN_LISTPARAMS] = listParams;
-	handles2x[PROTOCOL_IN_SETPARAM] = setParam;
-	handles2x[PROTOCOL_IN_GETPARAM] = getParam;
+// PROTOCOL_IN_EDITOR_*
+LRESULT CALLBACK windowMessageHandle(HWND whandle, UINT message, WPARAM w, LPARAM l) {
+	switch(message) {
+		case WM_DESTROY:
+			// Destroy reference.
+			DestroyWindow(whandle);
+
+			EnterCriticalSection(&threadCritSection);
+			windowHandle = NULL;
+			LeaveCriticalSection(&threadCritSection);
+
+			return 0;
+		break;
+
+		default:			
+			return DefWindowProc(whandle, message, w, l);
+		break;
+	}
+}
+
+DWORD WINAPI windowThread(LPVOID param) {
+	// Enter CriticalSection.
+
+	EnterCriticalSection(&threadCritSection);
+	if(windowHandle == NULL) {
+		// Initialize COM components.
+		CoInitialize(NULL);
+
+		AEffect* aeffect = (AEffect*)param;
+		// Get the required size.
+		ERect* size = NULL;	aeffect -> dispatcher(aeffect, effEditGetRect, 0, 0, &size, 0);
+		int left = size -> left;		int right = size -> right;
+		int top = size -> top;			int bottom = size -> bottom;
+		int width = right - left;		int height = bottom - top;
+
+		// Open window.
+		int properties = WS_TILED | WS_CAPTION | WS_SYSMENU;
+		windowHandle = CreateWindow("VSTLOADER", "VSTLOADER", properties,
+			CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, NULL, NULL);
+
+		// Set window and display.
+		aeffect -> dispatcher(aeffect, effEditOpen, 0, 0, windowHandle, 0);
+		ShowWindow(windowHandle, SW_SHOWNORMAL);
+		UpdateWindow(windowHandle);
+
+		// Release lock.
+		LeaveCriticalSection(&threadCritSection);
+
+		// Return value.
+		ready();
+		
+		// Enter refresh thread.
+		MSG msg;
+		while(GetMessage(&msg, 0, 0, 0) > 0) {
+			DispatchMessage(&msg);
+			TranslateMessage(&msg);
+		}
+	}
+	else {
+		LeaveCriticalSection(&threadCritSection);	// Release lock directly.
+		ready();
+	}
+
+	return 0;
+}
+
+int openEditor(AEffect* effect) {
+	if(windowHandle == NULL) {
+		// Create refresh thread.
+		HANDLE threadHandle = CreateThread(NULL, 0, windowThread, effect, 0, NULL);
+		if(threadHandle == NULL) return ERROR_WND_CREATE;
+	}
+	else ready();
+	return ERROR_NONE;
+}
+
+
+int closeEditor(AEffect* effect) {
+	EnterCriticalSection(&threadCritSection);
+	if(windowHandle != NULL) {
+		effect -> dispatcher(effect, effEditClose, 0, 0, 0, 0);
+		PostMessage(windowHandle, WM_DESTROY, NULL, NULL);
+	}
+	LeaveCriticalSection(&threadCritSection);
+
+	ready();
+	return ERROR_NONE;
+}
+
+int isEditorOpen(AEffect* effect) {
+	ready();
+	putchar(windowHandle != NULL? 1 : 0);
+	fflush(stdout);
+	return ERROR_NONE;
+}
+
+int loadHandles2x(AEffect* effect) {
+	// Load virtual function table.
+	handles[PROTOCOL_IN_METADATA] = readMetadata;
+
+	handles[PROTOCOL_IN_PROCESS] = processInput;
+	handles[PROTOCOL_IN_EMPTY_PROCESS] = processCore;
+
+	handles[PROTOCOL_IN_OPEN] = effectOpen;
+	handles[PROTOCOL_IN_CLOSE] = effectClose;
+	handles[PROTOCOL_IN_SUSPEND] = effectSuspend;
+	handles[PROTOCOL_IN_RESUME] = effectSuspend;
+
+	handles[PROTOCOL_IN_LISTPARAMS] = listParams;
+	handles[PROTOCOL_IN_SETPARAM] = setParam;
+	handles[PROTOCOL_IN_GETPARAM] = getParam;
+
+	handles[PROTOCOL_IN_FLAGS] = getFlags;
+
+	handles[PROTOCOL_IN_OPEN_EDITOR] = openEditor;
+	handles[PROTOCOL_IN_CLOSE_EDITOR] = closeEditor;
+	handles[PROTOCOL_IN_IS_EDITOR_OPEN] = isEditorOpen;
+
+	// Get the module handle
+	handle = GetModuleHandle(NULL);
+	
+	// Register window class
+	if((effect -> flags & effFlagsHasEditor) != 0) {
+		WNDCLASS windowClass = {0};
+		windowClass.lpszClassName = "VSTLOADER";
+		windowClass.style = CS_HREDRAW | CS_VREDRAW;
+		windowClass.lpfnWndProc = (WNDPROC)windowMessageHandle;
+		windowClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+		windowClass.hInstance = handle;
+		windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+		windowClass.hIcon = NULL;
+		windowClass.lpszMenuName = NULL;
+		if(!RegisterClass(&windowClass))
+			return ERROR_WND_REGISTER;
+	}
+
+	// Initialize critical section.
+	InitializeCriticalSection(&threadCritSection);
+
+	return ERROR_NONE;
+}
+
+void unloadHandles2x(AEffect* effect) {
+	// Close window.
+	if(windowHandle != NULL) 
+		DestroyWindow(windowHandle);
+
+	// De-Initalize.
+	DeleteCriticalSection(&threadCritSection);
 }
 
 #endif

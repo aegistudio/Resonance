@@ -23,7 +23,13 @@ public enum EnumOperation {
 	
 	LIST_PARAMS,
 	SET_PARAM,
-	GET_PARAM;
+	GET_PARAM,
+	
+	FLAGS,
+	
+	OPEN_EDITOR,
+	CLOSE_EDITOR,
+	IS_EDITOR_OPEN;
 	
 	public void write(OutputStream output) throws IOException {
 		output.write(ordinal());
