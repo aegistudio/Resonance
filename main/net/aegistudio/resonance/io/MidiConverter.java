@@ -1,8 +1,7 @@
-package net.aegistudio.resonance.io.midi;
+package net.aegistudio.resonance.io;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import javax.sound.midi.MidiEvent;
@@ -16,6 +15,7 @@ import net.aegistudio.resonance.channel.Score;
 import net.aegistudio.resonance.music.NoteOffEvent;
 import net.aegistudio.resonance.music.NoteOnEvent;
 import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.plugin.MidiEventFactory;
 
 /**
  * This class serve as a runtime converter that
@@ -25,28 +25,9 @@ import net.aegistudio.resonance.plugin.Event;
  */
 
 public class MidiConverter {
+	public static final byte MIDI_EVENT_MASK = (byte) 0x0f0;
+	public static final byte MIDI_CHANNEL_MASK = (byte)0x00f;
 	
-	public final HashMap<Integer, MidiEventProxy<?, ?>> statusMap
-		= new HashMap<Integer, MidiEventProxy<?, ?>>();	
-	@SuppressWarnings("rawtypes")
-	public final HashMap<Class<? extends Event>, MidiEventProxy> classMap
-		= new HashMap<Class<? extends Event>, MidiEventProxy>();
-	
-	public MidiConverter()
-	{
-		NoteOnProxy noteOn = new NoteOnProxy();
-		statusMap.put(noteOn.getEventCode(), noteOn);
-		classMap.put(NoteOnEvent.class, noteOn);
-		
-		NoteOffProxy noteOff = new NoteOffProxy();
-		statusMap.put(noteOff.getEventCode(), noteOff);
-		classMap.put(NoteOffEvent.class, noteOff);
-	}
-	
-	public static byte MIDI_EVENT_MASK = (byte) 0x0f0;
-	public static byte MIDI_CHANNEL_MASK = (byte)0x00f;
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void decapsulateTrack(Score targetScore, Track sourceTrack, int tickPerQuarterNote)
 	{
 		ArrayList<KeywordEntry<Double, Event>> events = new	ArrayList<KeywordEntry<Double, Event>>();
@@ -54,9 +35,9 @@ public class MidiConverter {
 		{
 			MidiEvent event = sourceTrack.get(i);
 			double time = 1.0 * event.getTick() / tickPerQuarterNote;
-			MidiEventProxy proxy = statusMap.get(event.getMessage().getStatus() & MIDI_EVENT_MASK);
+			MidiEventFactory proxy = MidiEventFactory.EVENT_MAP.get(event.getMessage().getStatus() & MIDI_EVENT_MASK);
 			if(proxy == null) continue;
-			events.add(new KeywordArray.DefaultKeywordEntry<Double, Event>(time, proxy.decapsulate(event.getMessage())));
+			events.add(new KeywordArray.DefaultKeywordEntry<Double, Event>(time, proxy.convert(event.getMessage())));
 		}
 		
 		TreeMap<Integer, ArrayDeque<KeywordEntry<Double, Event>>> notes
@@ -85,7 +66,6 @@ public class MidiConverter {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void encapsulateTrack(Track targetTrack, Score sourceScore, int tickPerQuarterNote)
 	{
 		for(KeywordEntry<Double, Note> note : sourceScore.getAllNotes().all())
@@ -93,8 +73,8 @@ public class MidiConverter {
 			NoteOnEvent noteOnEvent = new NoteOnEvent(note.getValue().pitch, note.getValue().velocity, 0);
 			NoteOffEvent noteOffEvent = new NoteOffEvent(note.getValue().pitch, 0);
 			
-			MidiMessage noteOnMessage = classMap.get(NoteOnEvent.class).encapsulate(noteOnEvent);
-			MidiMessage noteOffMessage = classMap.get(NoteOffEvent.class).encapsulate(noteOffEvent);
+			MidiMessage noteOnMessage = noteOnEvent.toMidiMessage();
+			MidiMessage noteOffMessage = noteOffEvent.toMidiMessage();
 			
 			targetTrack.add(new MidiEvent(noteOnMessage, (int)(note.getKeyword() * tickPerQuarterNote)));
 			targetTrack.add(new MidiEvent(noteOffMessage, (int)((note.getKeyword() + note.getValue().duration) * tickPerQuarterNote)));

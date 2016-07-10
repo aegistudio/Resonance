@@ -1,8 +1,8 @@
 package net.aegistudio.resonance.music;
 
-import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.plugin.MidiEvent;
 
-public abstract class NoteEvent implements Event{
+public abstract class NoteEvent implements MidiEvent{
 	public final byte note;
 	public final int frameOffset;
 	
