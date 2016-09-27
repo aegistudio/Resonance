@@ -1,9 +1,7 @@
 package net.aegistudio.resonance.plugin.vst;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class VstParameter {
 	public final String label;
@@ -15,30 +13,27 @@ public class VstParameter {
 	private float value;
 	private String display;
 	
-	public VstParameter(int index, VstPlugin plugin, InputStream input) throws IOException {
-		DataInputStream dataInput = new DataInputStream(input);
+	public VstParameter(int index, VstPlugin plugin, DataInputStream input) throws IOException {
 		this.index = index;
 		this.plugin = plugin;
 		
-		this.label = dataInput.readUTF();
-		this.display = dataInput.readUTF();
-		this.name = dataInput.readUTF();
-		this.value = dataInput.readFloat();
+		this.label = input.readUTF();
+		this.display = input.readUTF();
+		this.name = input.readUTF();
+		this.value = input.readFloat();
 	}
 	
 	public void setValue(float newValue) {
 		plugin.operate((i, o, e) -> {
 			EnumOperation.SET_PARAM.write(o);
-			DataOutputStream param = new DataOutputStream(o);
-			param.writeInt(index);
-			param.writeFloat(newValue);
-			param.flush();
+			o.writeInt(index);
+			o.writeFloat(newValue);
+			o.flush();
 			
 			plugin.ensureInput();
 			value = newValue;
 			
-			DataInputStream result = new DataInputStream(i);
-			display = result.readUTF();
+			display = i.readUTF();
 		});
 	}
 	
@@ -53,15 +48,13 @@ public class VstParameter {
 	public void sync() {
 		plugin.operate((i, o, e) -> {
 			EnumOperation.GET_PARAM.write(o);
-			DataOutputStream param = new DataOutputStream(o);
-			param.writeInt(index);
-			param.flush();
+			o.writeInt(index);
+			o.flush();
 			
 			plugin.ensureInput();
 			
-			DataInputStream result = new DataInputStream(i);
-			value = result.readFloat();
-			display = result.readUTF();
+			value = i.readFloat();
+			display = i.readUTF();
 		});
 	}
 }

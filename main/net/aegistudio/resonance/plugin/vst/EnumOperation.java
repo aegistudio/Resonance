@@ -29,7 +29,9 @@ public enum EnumOperation {
 	
 	OPEN_EDITOR,
 	CLOSE_EDITOR,
-	IS_EDITOR_OPEN;
+	IS_EDITOR_OPEN,
+	
+	MIDI_EVENT;
 	
 	public void write(OutputStream output) throws IOException {
 		output.write(ordinal());

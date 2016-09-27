@@ -9,8 +9,6 @@
 #include "io.h"
 #include "vstprotocol.h"
 
-Metadata metadata;
-
 VstIntPtr loaderMasterCallback (AEffect* effect, VstIntPtr opcode, 
 	VstInt32 index, VstIntPtr value, void* ptr, float opt) {
 
@@ -25,8 +23,9 @@ VstIntPtr loaderMasterCallback (AEffect* effect, VstIntPtr opcode,
 }
 
 #include "vstbuffer.h"
-void updateMetadata() {
+void updateMetadata(AEffect* effect) {
 	resetBuffer();
+	effect -> dispatcher(effect, effSetSampleRate, 0, 0, 0, metadata.sampleRate);
 }
 
 #include "vstprotocol.cpp"
@@ -43,6 +42,9 @@ int dllMain(HINSTANCE vsthandle) {
 	// Judge and load handle.
 	int loadResult = loadHandles2x(effectInstance);
 	if(loadResult != ERROR_NONE) return loadResult;
+
+	// Allocate buffer space.
+	updateMetadata(effectInstance);
 
 	// When you receive ready token, you could start.
 	ready();
@@ -76,8 +78,9 @@ int main(int argv, char** args) {
 	if(argv <= 1) return wrong(ERROR_VST_UNSPECIFIED);
 
 	// Initialize metadata.
-	metadata.masterVersion = 2400;
+	metadata.masterVersion = 3100;
 	metadata.processDouble = false;
+	metadata.sampleRate = 44100.f;
 	metadata.channels = 2;
 	metadata.sampleFrames = 1024;
 
@@ -86,9 +89,6 @@ int main(int argv, char** args) {
 		if(strcmp("-m", args[i]) == 0) 
 			fread(&metadata, sizeof(metadata), 1, stdin);
 	}
-
-	// Allocate buffer space.
-	updateMetadata();
 
 	// Load vst library First.
 	HINSTANCE vsthandle = LoadLibraryA(args[1]);

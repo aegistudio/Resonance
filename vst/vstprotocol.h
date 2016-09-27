@@ -28,9 +28,11 @@ struct Metadata {
 	int masterVersion;			// the audio master version. 
 
 	bool processDouble;			// whether we use double precision.
+
+	float sampleRate;			// the sample rate
 	int channels;				// how many channels.
 	int sampleFrames;			// how many frames per sample
-};
+} metadata;
 // Output: None
 
 #define PROTOCOL_OUT_READY		0	// when the program is ready.
@@ -43,16 +45,16 @@ enum ProtocolIn {
 	// Output: void
 
 	PROTOCOL_IN_METADATA,		// we will update the metadata.
-	// Input: struct Metadata
+	// Input: struct Metadata (excluding master version)
 	// Output: void
 
 	PROTOCOL_IN_PROCESS,		// start processing.
-	// Input: The Input Buffer
-	// Output: The Output Buffer
+	// Input: The Input Buffer (must be double!)
+	// Output: The Output Buffer (must be double!)
 
 	PROTOCOL_IN_EMPTY_PROCESS,	// the input will be empty.
 	// Input: None
-	// Output: The Output Buffer
+	// Output: The Output Buffer (must be double!)
 
 	PROTOCOL_IN_OPEN,		// start the effect.
 	PROTOCOL_IN_CLOSE,		// end the effect.
@@ -102,6 +104,14 @@ enum ProtocolIn {
 	// Input: None
 	// Output: byte
 	// 	0 for false and 1 for true.
+
+	PROTOCOL_IN_MIDI_EVENT,		// process midi event.
+					// midi events will be buffered until process.
+	// Input: 
+	//	deltaFrame: int
+	// 	length : byte
+	// 	data : byte[length]
+	// Output: None
 
 	PROTOCOL_MAX
 };

@@ -11,42 +11,38 @@ double *doubleInput, *doubleOutput;
 double* doubleInputChannel[MAX_CHANNEL];
 double* doubleOutputChannel[MAX_CHANNEL];
 
-int bufferSize;
-void* inputBuffer;
-void* outputBuffer;
+int bufferSize, sampleTotal;
+void *inputBuffer, *outputBuffer;
 
 void freeBuffer() {
-	if(floatInput == NULL) delete[] floatInput;
-	if(floatOutput == NULL) delete[] floatOutput;
-	if(doubleInput == NULL) delete[] doubleInput;
-	if(doubleOutput == NULL) delete[] doubleOutput;
+	if(floatInput) delete[] floatInput;
+	if(floatOutput) delete[] floatOutput;
+	if(doubleInput) delete[] doubleInput;
+	if(doubleOutput) delete[] doubleOutput;
 }
 
 void resetBuffer() {
 	freeBuffer();
-	int sampleTotal = metadata.channels * metadata.sampleFrames;
-	if(metadata.processDouble) {	
-		doubleInput = new double[sampleTotal];
-		doubleOutput = new double[sampleTotal];
-		int i = 0; for(; i < metadata.channels; i++) {
-			doubleInputChannel[i] = doubleInput + i * metadata.sampleFrames;
-			doubleOutputChannel[i] = doubleOutput + i * metadata.sampleFrames;
-		}
-		bufferSize = sampleTotal * sizeof(double);
-		inputBuffer = doubleInput;
-		outputBuffer = doubleOutput;
-	}
-	else {
+	sampleTotal = metadata.channels * metadata.sampleFrames;
+	bufferSize = sampleTotal * sizeof(double);
+
+	if(!metadata.processDouble) {	
 		floatInput = new float[sampleTotal];
 		floatOutput = new float[sampleTotal];
 		int i = 0; for(; i < metadata.channels; i ++) {
 			floatInputChannel[i] = floatInput + i * metadata.sampleFrames;
 			floatOutputChannel[i] = floatOutput + i * metadata.sampleFrames;
 		}
-		bufferSize = sampleTotal * sizeof(float);
-		inputBuffer = floatInput;
-		outputBuffer = floatOutput;
 	}
+
+	doubleInput = new double[sampleTotal];
+	doubleOutput = new double[sampleTotal];
+	int i = 0; for(; i < metadata.channels; i++) {
+		doubleInputChannel[i] = doubleInput + i * metadata.sampleFrames;
+		doubleOutputChannel[i] = doubleOutput + i * metadata.sampleFrames;
+	}
+	inputBuffer = doubleInput;
+	outputBuffer = doubleOutput;
 }
 
 #endif

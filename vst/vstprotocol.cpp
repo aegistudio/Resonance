@@ -3,6 +3,7 @@
 
 #include "vstprotocol.h"
 #define MAX_VST_PARAMSIZE 128
+#define MAX_VST_EVENTS_PERFRAME 128
 
 #pragma comment(lib, "ole32.lib")
 
@@ -10,36 +11,56 @@ HWND windowHandle = NULL;
 HINSTANCE handle = NULL;
 CRITICAL_SECTION threadCritSection;
 
+void* eventAllocation;
+VstEvents* events;
+VstEvent event[MAX_VST_EVENTS_PERFRAME];
+
 // PROTOCOL_IN_METADATA
-int readMetadata(AEffect*) {
-	fread(&metadata, sizeof(metadata), 1, stdin);
-	updateMetadata();
+int readMetadata(AEffect* effect) {
+	metadata.processDouble = getchar() == 1;
+	readFloat(&metadata.sampleRate);
+	readInt(&metadata.channels);
+	readInt(&metadata.sampleFrames);
+
+	updateMetadata(effect);
+
 	return ready();
 }
 
 // PROTOCOL_IN_EMPTY_PROCESS
 int processCore(AEffect* effect) {
-	int i = 0; //Iterable variant.
+	// Dispatch events.
+	if(events -> numEvents > 0) {
+		effect -> dispatcher(effect, effProcessEvents, 0, 0, events, 0);
+		events -> numEvents = 0;
+	}
 
+	int i = 0; //Iterable variant.
 	// Call the actual effect plugin.
 	if(metadata.processDouble) {
-		for(i = 0; i < bufferSize; i ++) 
-			reverseBitOrder(doubleInputChannel + i, sizeof(double));
+		// Double process.
 		effect -> processDoubleReplacing(effect, 
 			doubleInputChannel, doubleOutputChannel, 
 			metadata.sampleFrames);
-		for(i = 0; i < bufferSize; i ++) 
-			reverseBitOrder(doubleOutputChannel + i, sizeof(double));
 	}
 	else {
-		for(i = 0; i < bufferSize; i ++) 
-			reverseBitOrder(floatInputChannel + i, sizeof(float));
+		// Down cast
+		for(i = 0; i < sampleTotal; i ++) 
+			floatInput[i] = (float)(doubleInput[i]);
+
+		// Float process
 		effect -> processReplacing(effect, 
 			floatInputChannel, floatOutputChannel, 
 			metadata.sampleFrames);
-		for(i = 0; i < bufferSize; i ++) 
-			reverseBitOrder(floatOutputChannel + i, sizeof(float));
+
+		// Up cast
+		for(i = 0; i < sampleTotal; i ++) 
+			doubleOutput[i] = (double)(floatOutput[i]);
 	}
+
+	// Reverse double bit order.
+	for(i = 0; i < sampleTotal; i ++) 
+		reverseBitOrder(doubleOutput + i, sizeof(double));
 
 	// Write output buffer to standard output.
 	return write(outputBuffer, bufferSize, 1);
@@ -48,7 +69,11 @@ int processCore(AEffect* effect) {
 // PROTOCOL_IN_PROCESS
 int processInput(AEffect* effect) {
 	// Read input buffer from standard input.
-	fread(inputBuffer, bufferSize, 1, stdin);
+	fread(doubleInput, bufferSize, 1, stdin);
+
+	// Reverse double bit order.
+	int i; for(i = 0; i < sampleTotal; i ++) 
+		reverseBitOrder(doubleInput + i, sizeof(double));
 
 	// Now process input.
 	return processCore(effect);
@@ -110,7 +135,7 @@ int setParam(AEffect* effect) {
 	float paramValue;	readFloat(&paramValue);	
 
 	effect -> setParameter(effect, paramId, paramValue);
-	
+
 	ready();
 	char display[kVstMaxParamStrLen + 1];
 	display[kVstMaxParamStrLen] = 0;
@@ -207,6 +232,9 @@ DWORD WINAPI windowThread(LPVOID param) {
 			DispatchMessage(&msg);
 			TranslateMessage(&msg);
 		}
+
+		// Uninitialize COM.
+		CoUninitialize();
 	}
 	else {
 		LeaveCriticalSection(&threadCritSection);	// Release lock directly.
@@ -246,6 +274,31 @@ int isEditorOpen(AEffect* effect) {
 	return ERROR_NONE;
 }
 
+int midiEvent(AEffect* effect) {
+	if(events -> numEvents < MAX_VST_EVENTS_PERFRAME) {
+		// Update event pointer.
+		int current = events -> numEvents;
+		events -> numEvents ++;
+
+		// Allocate as midi event.
+		VstMidiEvent* eventAddress = (VstMidiEvent*)(events -> events[current]);
+		VstMidiEvent& eventCurrent = *eventAddress;
+		eventCurrent.type = kVstMidiType;
+		eventCurrent.byteSize = sizeof(VstMidiEvent);
+		eventCurrent.flags = 0;
+		eventCurrent.noteLength = 0;
+		eventCurrent.noteOffset = 0;
+
+		// Read midi event
+		readInt(&(eventCurrent.deltaFrames));
+		int length = getchar();
+		fread(&(eventCurrent.midiData), length, 1, stdin);
+	}
+	ready();
+
+	return ERROR_NONE;
+}
+
 int loadHandles2x(AEffect* effect) {
 	// Load virtual function table.
 	handles[PROTOCOL_IN_METADATA] = readMetadata;
@@ -267,6 +320,7 @@ int loadHandles2x(AEffect* effect) {
 	handles[PROTOCOL_IN_OPEN_EDITOR] = openEditor;
 	handles[PROTOCOL_IN_CLOSE_EDITOR] = closeEditor;
 	handles[PROTOCOL_IN_IS_EDITOR_OPEN] = isEditorOpen;
+	handles[PROTOCOL_IN_MIDI_EVENT] = midiEvent;
 
 	// Get the module handle
 	handle = GetModuleHandle(NULL);
@@ -289,6 +343,15 @@ int loadHandles2x(AEffect* effect) {
 	// Initialize critical section.
 	InitializeCriticalSection(&threadCritSection);
 
+	// Initialize midi events.
+	eventAllocation = malloc(sizeof(struct VstEvents) + (MAX_VST_EVENTS_PERFRAME -2) * sizeof(struct VstEvents*));
+	events = (struct VstEvents*)eventAllocation;
+
+	events -> numEvents = 0;
+	events -> reserved = 0;
+	int i = 0; for(; i < MAX_VST_EVENTS_PERFRAME; i ++)
+		events -> events[i] = event + i;
+
 	return ERROR_NONE;
 }
 
@@ -299,6 +362,8 @@ void unloadHandles2x(AEffect* effect) {
 
 	// De-Initalize.
 	DeleteCriticalSection(&threadCritSection);
+
+	free(eventAllocation);
 }
 
 #endif

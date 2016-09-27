@@ -21,11 +21,8 @@ import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.test.util.SineOscillator;
 
 public class MusicLayerRendering {
-	public static void main(String[] arguments)
-	{	
+	public static void test(Plugin plugin) {
 		MusicController musicLayer = new MusicController();
-		
-		Plugin plugin = new SineOscillator();
 		
 		Score theScore = musicLayer.scoreHolder.create("score1");
 		
@@ -104,5 +101,9 @@ public class MusicLayerRendering {
 		
 		res.setEnvironment(new Environment(44100.0f, 2, new Encoding(Encoding.BITDEPTH_BIT32 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG), 128, 16), new MixerDevice(AudioSystem.getMixerInfo()[0]));
 		res.play();
+	}
+	
+	public static void main(String[] arguments) {	
+		test(new SineOscillator());
 	}
 }

@@ -1,12 +1,18 @@
 package net.aegistudio.resonance.plugin.vst;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.util.function.Consumer;
+
+import javax.sound.midi.MidiMessage;
 
 import net.aegistudio.resonance.Frame;
+import net.aegistudio.resonance.dataflow.ResetEvent;
 import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.plugin.MidiEvent;
 import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.serial.Structure;
 
@@ -20,8 +26,8 @@ public class VstPlugin implements Plugin {
 	}
 
 	public Process process;
-	public InputStream processOutput, processError;
-	public OutputStream processInput;
+	public DataInputStream processOutput, processError;
+	public DataOutputStream processInput;
 	
 	public VstParameter[] paramList;
 	
@@ -40,9 +46,9 @@ public class VstPlugin implements Plugin {
 			arguments[cmd.length] = vst;
 			this.process = Runtime.getRuntime().exec(arguments);
 			
-			this.processOutput = this.process.getInputStream();
-			this.processError = this.process.getErrorStream();
-			this.processInput = this.process.getOutputStream();
+			this.processOutput = new DataInputStream(this.process.getInputStream());
+			this.processError = new DataInputStream(this.process.getErrorStream());
+			this.processInput = new DataOutputStream(this.process.getOutputStream());
 		}
 		catch(IOException e) {
 			throw new VstException(e.getMessage());
@@ -78,16 +84,67 @@ public class VstPlugin implements Plugin {
 			for(int j = 0; j < paramCount; j ++) 
 				paramList[j] = new VstParameter(j, this, i);
 		});
+		
+		operate((i, o, e) -> {
+			EnumOperation.RESUME.write(o);
+			ensureInput();
+		});
 	}
 	
 	@Override
 	public void trigger(Event event) {
-		
+		if(event instanceof MidiEvent) {
+			operate((i, o, e) -> {
+				MidiEvent midiEvent = (MidiEvent) event;
+				EnumOperation.MIDI_EVENT.write(o);
+				o.writeInt(midiEvent.getFrameOffset());
+				
+				MidiMessage message = midiEvent.toMidiMessage();
+				o.write(message.getLength());
+				o.write(message.getMessage(), 0, message.getLength());
+				o.flush();
+				
+				ensureInput();
+			});
+		}
+		else if(event instanceof ResetEvent) {
+			operate((i, o, e) -> {
+				EnumOperation.METADATA.write(o);
+				
+				ResetEvent resetEvent = (ResetEvent) event;
+				o.write(this.canDoubleReplacing? 1 : 0);
+				o.writeFloat(resetEvent.environment.sampleRate);
+				o.writeInt(resetEvent.environment.channels);
+				o.writeInt(resetEvent.environment.samplesPerFrame);
+				o.flush();
+				
+				ensureInput();
+			});
+		}
 	}
 
 	@Override
 	public void process(Frame input, Frame output) {
-		
+		operate((i, o, e) -> {
+			if(!isSynth) {
+				EnumOperation.PROCESS.write(o);
+				for(int j = 0; j < input.getChannels(); j ++) {
+					double[] channel = input.getSamples(j);
+					for(int k = 0; k < input.getSamplesPerFrame(); k ++) 
+						o.writeDouble(channel[k]);
+				}
+			}
+			else EnumOperation.PROCESS_EMPTY.write(o);
+			o.flush();
+			
+			ensureInput();
+			
+			for(int j = 0; j < output.getChannels(); j ++) {
+				double[] channel = output.getSamples(j);
+				for(int k = 0; k < output.getSamplesPerFrame(); k ++) 
+					channel[k] = i.readDouble();
+			}
+		});
 	}
 	
 	public void openEditor() throws VstException {
@@ -128,22 +185,32 @@ public class VstPlugin implements Plugin {
 		
 		operate((i, o, e) -> EnumOperation.TERMINATE.write(o));
 		abandon();
-
 	}
-	
+
+	public void readError(Consumer<String> errorProcessor) {
+		try {
+			BufferedReader errorReader = new BufferedReader(
+					new InputStreamReader(processError));
+			String error;	while((error = errorReader.readLine()) != null) 
+				errorProcessor.accept(error);
+		}
+		catch(Exception e) {
+		}
+	}
+
 	protected void abandon() {
 		this.process.destroy();
 		this.process = null;
 	}
 	
 	public static interface Operation<T> {
-		public T communicate(InputStream input, OutputStream output, 
-				InputStream error) throws VstException, IOException;
+		public T communicate(DataInputStream input, DataOutputStream output, 
+				DataInputStream error) throws VstException, IOException;
 	}
 	
 	public static interface OperationVoid {
-		public void communicate(InputStream input, OutputStream output, 
-				InputStream error) throws VstException, IOException;
+		public void communicate(DataInputStream input, DataOutputStream output, 
+				DataInputStream error) throws VstException, IOException;
 	}
 	
 	public synchronized <T> T operateFunc(Operation<T> todo) throws VstException {
