@@ -2,7 +2,7 @@
 <project name="Resonance" default="main">
 	<property name="ps" value="${path.separator}"/>
 	<property name="fs" value="${file.separator}"/>
-	<property name="dir.src" value="main${fs}cpp"/>
+	<property name="dir.src" value="src${fs}main${fs}cpp"/>
 	<property name="loader" value="${dir.src}${fs}vstloader.cpp"/>
 	
 	<!-- See also the vstloader.property.pattern for information. -->
