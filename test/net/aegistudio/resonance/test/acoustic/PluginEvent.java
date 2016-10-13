@@ -2,20 +2,20 @@ package net.aegistudio.resonance.test.acoustic;
 
 import javax.sound.sampled.AudioSystem;
 
-import net.aegistudio.resonance.Encoding;
-import net.aegistudio.resonance.Environment;
-import net.aegistudio.resonance.Frame;
 import net.aegistudio.resonance.Resonance;
+import net.aegistudio.resonance.common.Encoding;
+import net.aegistudio.resonance.common.Environment;
+import net.aegistudio.resonance.common.Event;
+import net.aegistudio.resonance.common.Frame;
+import net.aegistudio.resonance.common.MusicFacade;
+import net.aegistudio.resonance.common.OutputFacade;
+import net.aegistudio.resonance.common.ResetEvent;
 import net.aegistudio.resonance.dataflow.DataflowController;
-import net.aegistudio.resonance.dataflow.ResetEvent;
 import net.aegistudio.resonance.dataflow.StripNode;
 import net.aegistudio.resonance.device.MixerDevice;
-import net.aegistudio.resonance.io.OutputController;
-import net.aegistudio.resonance.io.OutputFacade;
-import net.aegistudio.resonance.music.MusicFacade;
-import net.aegistudio.resonance.music.NoteOffEvent;
-import net.aegistudio.resonance.music.NoteOnEvent;
-import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.format.OutputController;
+import net.aegistudio.resonance.midi.NoteOffEvent;
+import net.aegistudio.resonance.midi.NoteOnEvent;
 import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.serial.Structure;
 

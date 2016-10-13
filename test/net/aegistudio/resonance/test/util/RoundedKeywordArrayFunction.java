@@ -3,9 +3,9 @@ package net.aegistudio.resonance.test.util;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.aegistudio.resonance.KeywordArray;
-import net.aegistudio.resonance.KeywordArray.*;
-import net.aegistudio.resonance.RoundedKeywordArray;
+import net.aegistudio.resonance.music.KeywordArray;
+import net.aegistudio.resonance.music.RoundedKeywordArray;
+import net.aegistudio.resonance.music.KeywordArray.*;
 
 public class RoundedKeywordArrayFunction
 {

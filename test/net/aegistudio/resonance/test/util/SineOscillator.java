@@ -3,11 +3,11 @@ package net.aegistudio.resonance.test.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.aegistudio.resonance.Frame;
-import net.aegistudio.resonance.dataflow.ResetEvent;
-import net.aegistudio.resonance.music.NoteOffEvent;
-import net.aegistudio.resonance.music.NoteOnEvent;
-import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.common.Event;
+import net.aegistudio.resonance.common.Frame;
+import net.aegistudio.resonance.common.ResetEvent;
+import net.aegistudio.resonance.midi.NoteOffEvent;
+import net.aegistudio.resonance.midi.NoteOnEvent;
 import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.serial.Structure;
 
@@ -32,6 +32,7 @@ public class SineOscillator implements Plugin
 	float[] pitches = new float[]{1.0f, 16.0f/15, 9.0f/8, 6.0f/5, 5.0f/4, 4.0f/3, 64.0f/45, 3.0f/2, 8.0f/5, 10.0f/6, 10.0f/6 * 16.0f/15, 30.0f/16};
 	Frame process;
 	int polytones = 0;
+	boolean stereo = true;
 	
 	@Override
 	public void trigger(Event event) {
@@ -39,6 +40,7 @@ public class SineOscillator implements Plugin
 		{
 			this.sampleRate = ((ResetEvent) event).environment.sampleRate;
 			this.process = new Frame(((ResetEvent) event).environment.channels, ((ResetEvent) event).environment.samplesPerFrame);
+			this.stereo = ((ResetEvent) event).environment.channels == 2;
 			oscillators.clear();
 			toRemove.clear();
 			polytones = 0;
@@ -106,7 +108,7 @@ public class SineOscillator implements Plugin
 		public void process(Frame output)
 		{
 			double[] left = output.getSamples(0);
-			double[] right = output.getSamples(1);
+			double[] right = stereo? output.getSamples(1) : output.getSamples(0);
 			
 			for(int i = 0; i < output.getSamplesPerFrame(); i ++)
 			{

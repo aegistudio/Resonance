@@ -1,11 +1,7 @@
 package net.aegistudio.resonance.test.acoustic;
 
-import net.aegistudio.resonance.Environment;
-import net.aegistudio.resonance.NamedHolder;
-import net.aegistudio.resonance.channel.ChannelHolder;
-import net.aegistudio.resonance.channel.Score;
-import net.aegistudio.resonance.mixer.Mixer;
-import net.aegistudio.resonance.music.MusicFacade;
+import net.aegistudio.resonance.common.Environment;
+import net.aegistudio.resonance.common.MusicFacade;
 import net.aegistudio.resonance.serial.Structure;
 
 /**
@@ -39,15 +35,6 @@ public class MusicDecoy implements MusicFacade
 
 	@Override
 	public double getBeatPosition() {				return 0;			}
-
-	@Override
-	public NamedHolder<Score> getScoreHolder() {	return null;	}
-
-	@Override
-	public ChannelHolder getChannelHolder() {		return null;	}
-
-	@Override
-	public Mixer getMixer() {		return null;	}
 
 	@Override
 	public double getLength() {		return 0;		}

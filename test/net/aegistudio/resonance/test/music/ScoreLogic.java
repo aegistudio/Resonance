@@ -1,15 +1,15 @@
 package net.aegistudio.resonance.test.music;
 
-import net.aegistudio.resonance.Frame;
-import net.aegistudio.resonance.KeywordArray;
-import net.aegistudio.resonance.KeywordArray.KeywordEntry;
-import net.aegistudio.resonance.NamedHolder;
-import net.aegistudio.resonance.channel.Channel;
-import net.aegistudio.resonance.channel.MidiChannel;
-import net.aegistudio.resonance.channel.Note;
-import net.aegistudio.resonance.channel.Score;
-import net.aegistudio.resonance.channel.ScoreClip;
-import net.aegistudio.resonance.plugin.Event;
+import net.aegistudio.resonance.common.Event;
+import net.aegistudio.resonance.common.Frame;
+import net.aegistudio.resonance.music.KeywordArray;
+import net.aegistudio.resonance.music.NamedHolder;
+import net.aegistudio.resonance.music.KeywordArray.KeywordEntry;
+import net.aegistudio.resonance.music.channel.Channel;
+import net.aegistudio.resonance.music.channel.MidiChannel;
+import net.aegistudio.resonance.music.channel.Note;
+import net.aegistudio.resonance.music.channel.Score;
+import net.aegistudio.resonance.music.channel.ScoreClip;
 import net.aegistudio.resonance.plugin.Plugin;
 import net.aegistudio.resonance.serial.Structure;
 

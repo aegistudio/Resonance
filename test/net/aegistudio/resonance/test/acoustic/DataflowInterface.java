@@ -2,16 +2,15 @@ package net.aegistudio.resonance.test.acoustic;
 
 import javax.sound.sampled.AudioSystem;
 
-import net.aegistudio.resonance.Encoding;
-import net.aegistudio.resonance.Environment;
-import net.aegistudio.resonance.Frame;
 import net.aegistudio.resonance.Resonance;
-import net.aegistudio.resonance.dataflow.DataflowFacade;
-import net.aegistudio.resonance.dataflow.DataflowNode;
+import net.aegistudio.resonance.common.DataflowFacade;
+import net.aegistudio.resonance.common.Encoding;
+import net.aegistudio.resonance.common.Environment;
+import net.aegistudio.resonance.common.Frame;
+import net.aegistudio.resonance.common.MusicFacade;
+import net.aegistudio.resonance.common.OutputFacade;
 import net.aegistudio.resonance.device.MixerDevice;
-import net.aegistudio.resonance.io.OutputController;
-import net.aegistudio.resonance.io.OutputFacade;
-import net.aegistudio.resonance.music.MusicFacade;
+import net.aegistudio.resonance.format.OutputController;
 import net.aegistudio.resonance.serial.Structure;
 
 /**
@@ -72,17 +71,6 @@ public class DataflowInterface
 			{
 				this.sampleRate = environment.sampleRate;
 			}
-
-			@Override
-			public DataflowNode getSuperSource() {
-				return null;
-			}
-
-			@Override
-			public DataflowNode getSuperDrain() {
-				return null;
-			}
-			
 		};
 		
 		

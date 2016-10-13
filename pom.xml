@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+     
+	<groupId>net.aegistudio.resonance</groupId>
+	<artifactId>resonance-core</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus.aegistudio.net</id>
+			<url>http://nexus.aegistudio.net/repository/resonance/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus.aegistudio.net</id>
+			<url>http://nexus.aegistudio.net/repository/resonance/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<name>Resonance Core</name>
+	<url>http://github.com/aegistudio/Resonance</url>
+	<description>The core provides model layers and capabilities for upper consumer of Resonance to use.</description>
+	<modules>
+		<module>resonance-common</module>
+		<module>resonance-dataflow</module>
+		<module>resonance-software-io</module>
+		<module>resonance-serial-bin</module>
+		<module>resonance-music</module>
+		<module>resonance-plugin-vstj</module>
+	</modules>
+	
+	<build><plugins><plugin>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<configuration>
+			<source>1.8</source><target>1.8</target>
+		</configuration>
+	</plugin></plugins></build>
+	<scm>
+		<url>git://github.com/aegistudio/Resonance</url>
+	</scm>
+</project>

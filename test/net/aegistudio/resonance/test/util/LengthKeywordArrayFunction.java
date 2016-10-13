@@ -3,12 +3,12 @@ package net.aegistudio.resonance.test.util;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.aegistudio.resonance.KeywordArray;
-import net.aegistudio.resonance.RoundedKeywordArray;
-import net.aegistudio.resonance.KeywordArray.DefaultKeywordEntry;
-import net.aegistudio.resonance.KeywordArray.KeywordEntry;
-import net.aegistudio.resonance.LengthKeywordArray;
-import net.aegistudio.resonance.LengthObject;
+import net.aegistudio.resonance.music.KeywordArray;
+import net.aegistudio.resonance.music.LengthKeywordArray;
+import net.aegistudio.resonance.music.LengthObject;
+import net.aegistudio.resonance.music.RoundedKeywordArray;
+import net.aegistudio.resonance.music.KeywordArray.DefaultKeywordEntry;
+import net.aegistudio.resonance.music.KeywordArray.KeywordEntry;
 
 public class LengthKeywordArrayFunction {
 	
