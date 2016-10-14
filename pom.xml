@@ -28,40 +28,8 @@
 		<module>resonance-serial-bin</module>
 		<module>resonance-music</module>
 		<module>resonance-plugin-vstj</module>
+		<module>resonance-core-dep</module>
 	</modules>
-	
-	<dependencyManagement><dependencies>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-common</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-dataflow</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-software-io</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-serial-bin</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-music</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.aegistudio.resonance</groupId>
-			<artifactId>resonance-plugin-vstj</artifactId>
-			<version>1.0</version>
-		</dependency>
-	</dependencies></dependencyManagement>
 
 	<build><plugins><plugin>
 		<artifactId>maven-compiler-plugin</artifactId>

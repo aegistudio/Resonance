@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.aegistudio.resonance</groupId>
+    <artifactId>resonance-core</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>resonance-core-dep</artifactId>
+  
+  <name>Resonance Core Module (Dependency)</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-common</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-dataflow</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-software-io</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-serial-bin</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-music</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.aegistudio.resonance</groupId>
+			<artifactId>resonance-plugin-vstj</artifactId>
+			<version>1.0</version>
+		</dependency>
+  </dependencies>
+  <packaging>pom</packaging>
+  <description>Provides dependency interface that depends on every core module so that higher level of Resonance could import artifacts of core modules.</description>
+</project>
