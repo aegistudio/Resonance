@@ -6,6 +6,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-dataflow</artifactId>
+  <version>1.0</version>
+    
   <name>Resonance Node-Based Dataflow Layer</name>
   <description>A node based dataflow layer that simulate dataflows by nodes and flow among node connections.</description>
   <dependencies>

@@ -6,6 +6,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-plugin-vstj</artifactId>
+  <version>1.0</version>
+  
   <name>Resonance VstJ Connector Bridge</name>
   <dependencies>
   	<dependency>

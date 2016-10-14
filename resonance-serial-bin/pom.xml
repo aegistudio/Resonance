@@ -6,6 +6,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-serial-bin</artifactId>
+  <version>1.0</version>
+  
   <name>Resonance Binary Serializer</name>
   <description>Serialize structures of resonance to binary or NBT form.</description>
   <dependencies>

@@ -8,7 +8,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-core-dep</artifactId>
-  
+  <version>1.0</version>
+    
   <name>Resonance Core Module (Dependency)</name>
   <url>http://maven.apache.org</url>
   <properties>

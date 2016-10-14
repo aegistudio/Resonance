@@ -6,6 +6,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-software-io</artifactId>
+  <version>1.0</version>
+  
   <name>Resonance Software I/O Module</name>
   <description>Implementation of input and output layers for software based I/O. Taking on the responsibility of transcoding software specific encoding to device specific encoding.</description>
   <dependencies>

@@ -6,6 +6,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>resonance-music</artifactId>
+  <version>1.0</version>
+  
   <name>Resonance Workstation Music Layer</name>
   <description>A commonly used music layer structure that features clips, channels, tracks, mixing boards, etc.</description>
   <dependencies>

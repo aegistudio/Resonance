@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.format;
+package net.aegistudio.resonance.music.channel;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
