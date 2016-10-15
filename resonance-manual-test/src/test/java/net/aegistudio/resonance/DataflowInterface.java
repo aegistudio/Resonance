@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.test.acoustic;
+package net.aegistudio.resonance;
 
 import javax.sound.sampled.AudioSystem;
 
@@ -33,13 +33,10 @@ import net.aegistudio.resonance.serial.Structure;
 
 public class DataflowInterface
 {
-	public static void main(String[] arguments) throws Exception
-	{
+	public static void main(String[] arguments) throws Exception {
 		MusicFacade musicDecoy = new MusicDecoy();
 		
-		DataflowFacade dataflowFacade = new DataflowFacade()
-		{
-
+		DataflowFacade dataflowFacade = new DataflowFacade() {
 			@Override
 			public void load(Structure input) {			}
 

@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.test.music;
+package net.aegistudio.resonance.music;
 
 import net.aegistudio.resonance.common.Event;
 import net.aegistudio.resonance.common.Frame;

@@ -1,7 +1,8 @@
-package net.aegistudio.resonance.test.acoustic;
+package net.aegistudio.resonance.plugin;
 
 import javax.sound.sampled.AudioSystem;
 
+import net.aegistudio.resonance.MusicDecoy;
 import net.aegistudio.resonance.Resonance;
 import net.aegistudio.resonance.common.Encoding;
 import net.aegistudio.resonance.common.Environment;
@@ -39,22 +40,18 @@ import net.aegistudio.resonance.serial.Structure;
  */
 
 public class PluginEvent{
-	public static void main(String[] arguments) throws Exception
-	{
+	public static void main(String[] arguments) throws Exception {
 		MusicFacade musicDecoy = new MusicDecoy();
 		
 		DataflowController dataflowFacade = new DataflowController(new StripNode());
 		dataflowFacade.getSuperSource().addOutputNode(dataflowFacade.getSuperDrain());
 		
-		Plugin plugin = new Plugin()
-		{
-
+		Plugin plugin = new Plugin() {
 			float sampleRate;
 			double phase = 0.0;
 
 			@Override
 			public void create(Structure parameter) {
-				
 			}
 
 			float[] pitches = new float[]{1.0f, 9.0f/8, 5.0f/4, 4.0f/3, 3.0f/2, 10.0f/6, 30.0f/16, 2.0f};
@@ -62,14 +59,12 @@ public class PluginEvent{
 			
 			@Override
 			public void trigger(Event event) {
-				if(event instanceof ResetEvent)
-				{
+				if(event instanceof ResetEvent) {
 					this.sampleRate = ((ResetEvent) event).environment.sampleRate;
 					this.phase = 0.0;
 					this.cycle = sampleRate / 386.0f;
 				}
-				else if(event instanceof NoteOnEvent)
-				{
+				else if(event instanceof NoteOnEvent) {
 					float cycle_base = sampleRate / 386.0f;
 					cycle = cycle_base / pitches[((NoteOnEvent) event).getNote() % pitches.length];
 				}
@@ -79,8 +74,7 @@ public class PluginEvent{
 
 			@Override
 			public void process(Frame input, Frame output) {
-				if(cycle == 0.0f)
-				{
+				if(cycle == 0.0f) {
 					output.copy(input);
 					phase = 0.0;
 					return;
@@ -88,8 +82,7 @@ public class PluginEvent{
 				
 				double[] left = output.getSamples(0);
 				double[] right = output.getSamples(1);
-				for(int i = 0; i < output.getSamplesPerFrame(); i ++)
-				{
+				for(int i = 0; i < output.getSamplesPerFrame(); i ++) {
 					left[i] = right[i] = Math.sin(phase);
 					phase += 2 * Math.PI / cycle;
 				}
@@ -99,7 +92,6 @@ public class PluginEvent{
 			public void destroy() {
 				
 			}
-			
 		};
 		
 		dataflowFacade.getSuperSource().setPlugin(plugin);
@@ -108,12 +100,13 @@ public class PluginEvent{
 		
 		Resonance res = new Resonance(outputFacade, dataflowFacade, musicDecoy);
 		
-		res.setEnvironment(new Environment(44100.0f, 2, new Encoding(Encoding.BITDEPTH_BIT32 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG), 128, 2), new MixerDevice(AudioSystem.getMixerInfo()[0]));
+		res.setEnvironment(new Environment(44100.0f, 2, 
+				new Encoding(Encoding.BITDEPTH_BIT32 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG), 128, 2), 
+				new MixerDevice(AudioSystem.getMixerInfo()[0]));
 		res.play();
 		
 		int i = 0;
-		while(true)
-		{
+		while(true) {
 			byte[] melody = new byte[]{0, -1, 0, -1, 4, -1, 4, -1, 5, -1, 5, -1, 4, 4, 4, -1,
 					3, -1, 3, -1, 2, -1, 2, -1, 1, -1, 1, -1, 0, 0, 0, -1};
 			if(melody[i] == -1) plugin.trigger(new NoteOffEvent((byte) 0, 0));

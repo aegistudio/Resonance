@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.test.music;
+package net.aegistudio.resonance.music;
 
 import javax.sound.sampled.AudioSystem;
 
@@ -18,7 +18,7 @@ import net.aegistudio.resonance.music.channel.Note;
 import net.aegistudio.resonance.music.channel.Score;
 import net.aegistudio.resonance.music.channel.ScoreClip;
 import net.aegistudio.resonance.plugin.Plugin;
-import net.aegistudio.resonance.test.util.SineOscillator;
+import net.aegistudio.resonance.SineOscillator;
 
 public class MusicLayerRendering {
 	public static void test(int offset, Plugin plugin) {

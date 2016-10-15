@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.test.plugin;
+package net.aegistudio.resonance.plugin;
 
 import net.aegistudio.resonance.plugin.vst.VstFactory;
 import net.aegistudio.resonance.plugin.vst.VstPlugin;

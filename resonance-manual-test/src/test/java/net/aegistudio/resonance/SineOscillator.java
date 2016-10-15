@@ -1,4 +1,4 @@
-package net.aegistudio.resonance.test.util;
+package net.aegistudio.resonance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,7 @@ import net.aegistudio.resonance.serial.Structure;
  * @author aegistudio
  */
 
-public class SineOscillator implements Plugin
-{
+public class SineOscillator implements Plugin {
 	public final HashMap<Integer, ArrayList<PartialOscillator>> oscillators
 		= new HashMap<Integer, ArrayList<PartialOscillator>>();
 	

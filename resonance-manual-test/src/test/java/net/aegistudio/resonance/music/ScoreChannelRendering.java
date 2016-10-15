@@ -1,8 +1,10 @@
-package net.aegistudio.resonance.test.music;
+package net.aegistudio.resonance.music;
 
 import javax.sound.sampled.AudioSystem;
 
+import net.aegistudio.resonance.MusicDecoy;
 import net.aegistudio.resonance.Resonance;
+import net.aegistudio.resonance.SineOscillator;
 import net.aegistudio.resonance.common.Encoding;
 import net.aegistudio.resonance.common.Environment;
 import net.aegistudio.resonance.common.MusicFacade;
@@ -20,16 +22,13 @@ import net.aegistudio.resonance.music.channel.Note;
 import net.aegistudio.resonance.music.channel.Score;
 import net.aegistudio.resonance.music.channel.ScoreClip;
 import net.aegistudio.resonance.plugin.Plugin;
-import net.aegistudio.resonance.test.acoustic.MusicDecoy;
-import net.aegistudio.resonance.test.util.SineOscillator;
 
 public class ScoreChannelRendering {
 	public static void main(String[] arguments)
 	{	
 		Plugin plugin = new SineOscillator();
 		
-		NamedHolder<Score> scoreHolder = new NamedHolder<Score>("score", false)
-		{
+		NamedHolder<Score> scoreHolder = new NamedHolder<Score>("score", false) {
 			@Override
 			protected Score newObject(Class<?> clazz) {
 				return new Score();
@@ -100,8 +99,7 @@ public class ScoreChannelRendering {
 		DataflowController flowController = new DataflowController(((MidiChannel)theChannel).sourceNode);
 		((MidiChannel)theChannel).drainNode.addOutputNode(flowController);
 		
-		MusicFacade musicDecoy = new MusicDecoy()
-		{
+		MusicFacade musicDecoy = new MusicDecoy() {
 			float bpm = 180.f;
 			float currentTick = 0.0f;
 			
@@ -109,15 +107,13 @@ public class ScoreChannelRendering {
 			int samplesPerFrame;
 			float increment;
 			
-			public void reset(Environment reset)
-			{
+			public void reset(Environment reset) {
 				sampleRate = reset.sampleRate;
 				samplesPerFrame = reset.samplesPerFrame;
 				increment = samplesPerFrame / sampleRate * (bpm / 60);
 			}
 			
-			public void tick()
-			{
+			public void tick() {
 				theChannel.doTick(currentTick, currentTick + increment, samplesPerFrame);
 				currentTick = currentTick + increment;
 			}
@@ -126,8 +122,9 @@ public class ScoreChannelRendering {
 		OutputFacade outputFacade = new OutputController();
 	
 		Resonance res = new Resonance(outputFacade, flowController, musicDecoy);
-		
-		res.setEnvironment(new Environment(44100.0f, 2, new Encoding(Encoding.BITDEPTH_BIT32 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG), 128, 16), new MixerDevice(AudioSystem.getMixerInfo()[0]));
+		res.setEnvironment(new Environment(44100.0f, 2, 
+				new Encoding(Encoding.BITDEPTH_BIT32 | Encoding.WORDTYPE_INT | Encoding.ENDIAN_BIG), 128, 16), 
+				new MixerDevice(AudioSystem.getMixerInfo()[0]));
 		res.play();
 	}
 }

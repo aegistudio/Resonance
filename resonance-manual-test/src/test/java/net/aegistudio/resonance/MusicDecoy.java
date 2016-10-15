@@ -1,7 +1,8 @@
-package net.aegistudio.resonance.test.acoustic;
+package net.aegistudio.resonance;
 
 import net.aegistudio.resonance.common.Environment;
 import net.aegistudio.resonance.common.MusicFacade;
+import net.aegistudio.resonance.music.LengthObject;
 import net.aegistudio.resonance.serial.Structure;
 
 /**
@@ -10,7 +11,7 @@ import net.aegistudio.resonance.serial.Structure;
  * @author aegistudio
  */
 
-public class MusicDecoy implements MusicFacade
+public class MusicDecoy implements MusicFacade, LengthObject
 {
 	@Override
 	public void load(Structure output)	{		}

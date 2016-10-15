@@ -29,6 +29,7 @@
 		<module>resonance-music</module>
 		<module>resonance-plugin-vstj</module>
 		<module>resonance-core-dep</module>
+		<module>resonance-manual-test</module>
 	</modules>
 
 	<build><plugins><plugin>
